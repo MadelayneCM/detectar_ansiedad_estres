@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar style="--background: #000000; --color: white;">
+    <ion-title>➕ Nuevo Médico</ion-title>
+
+    <ion-buttons slot="end" *ngIf="medicoActivo">
+      <ion-button disabled fill="clear">
+        <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+        {{ medicoActivo.nombre }}
+      </ion-button>
+
+      <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contenido-centrado">
+  <div class="formulario-wrapper">
+    <form class="formulario-medico-container" (ngSubmit)="agregarMedico()">
+      <ion-item>
+        <ion-label class="tema" position="floating">Nombre</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.nombre" name="nombre" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label class="tema" position="floating">Apellido</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.apellido" name="apellido" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="tema" position="floating">Especialidad</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.especialidad" name="especialidad" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="tema" position="floating">Correo</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.correo" name="correo" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="tema" position="floating">Teléfono</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.telefono" name="telefono" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label class="tema" position="floating">Contraseña</ion-label>
+        <ion-input class="resp" [(ngModel)]="nuevoMedico.contrasena" name="contrasena" type="password" required  [type]="verContrasena ? 'text' : 'password'"></ion-input>
+        <ion-icon
+        slot="end"
+        [name]="verContrasena ? 'eye-off-outline' : 'eye-outline'"
+        (click)="toggleVerContrasena()"
+        class="ver-icon"
+      ></ion-icon>
+      </ion-item>
+
+
+      <ion-button class="boton-guardar" expand="block" type="submit">
+        Guardar Médico
+      </ion-button>
+      
+      <ion-button expand="block"  class="login-btn" (click)="regresar()">
+      Cancelar
+    </ion-button>
+    
+    </form>
+  </div>
+</ion-content>

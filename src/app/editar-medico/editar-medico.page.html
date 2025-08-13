@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-toolbar style="--background: #000000; --color: white;">
+    <ion-title>📚 Editar Médico 👨‍⚕️</ion-title>
+    <ion-buttons slot="end" *ngIf="medicoActivo">
+      <ion-button disabled fill="clear">
+        <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+        {{ medicoActivo.nombre }}
+      </ion-button>
+
+      <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <div class="form-container">
+  <form (ngSubmit)="guardarCambios()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input [(ngModel)]="medico.nombre" name="nombre" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Especialidad</ion-label>
+      <ion-input [(ngModel)]="medico.especialidad" name="especialidad" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Correo</ion-label>
+      <ion-input [(ngModel)]="medico.correo" name="correo" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Teléfono</ion-label>
+      <ion-input [(ngModel)]="medico.telefono" name="telefono" required></ion-input>
+    </ion-item>
+
+        <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input
+        [(ngModel)]="medico.contrasena"
+        name="contrasena"
+        [type]="verContrasena ? 'text' : 'password'"
+        required
+      ></ion-input>
+      <ion-icon
+        slot="end"
+        [name]="verContrasena ? 'eye-off-outline' : 'eye-outline'"
+        (click)="toggleVerContrasena()"
+        class="ver-icon"
+      ></ion-icon>
+    </ion-item>
+
+
+
+    <ion-button expand="block" type="submit" class="login-btn">
+      Guardar Cambios
+    </ion-button>
+    <ion-button expand="block"  class="login-btn" (click)="regresar()">
+      Cancelar
+    </ion-button>
+    
+  </form>
+  </div>
+</ion-content>

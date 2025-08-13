@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-toolbar  style="--background: #000000; --color: white;">
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end" *ngIf="medicoActivo">
+        <ion-button disabled fill="clear">
+          <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+          {{ medicoActivo.nombre }}
+        </ion-button>
+
+        <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2 class="ion-text-center">Estadísticas de Diagnósticos</h2>
+
+  <ion-content class="ion-padding">
+  <canvas id="barChart" style="margin-bottom: 40px;"></canvas>
+  <canvas id="comboChart"></canvas>
+</ion-content>
+
+</ion-content>
+
+
+<!-- Bottom Tab personalizada -->
+<div class="tab-bar-custom">
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Inicio'" 
+    (click)="seleccionarTab('home')">
+    <div class="icon-bg">
+      <ion-icon name="home-outline"></ion-icon>
+    </div>
+    <span>Inicio</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'diagnostico'" 
+    (click)="seleccionarTab('formulario-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="pulse-outline"></ion-icon>
+    </div>
+    <span>Diagnóstico</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'historial'" 
+    (click)="seleccionarTab('historial-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="time-outline"></ion-icon>
+    </div>
+    <span>Historial</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Médicos'" 
+    (click)="seleccionarTab('historial-medicos')">
+    <div class="icon-bg">
+    <ion-icon name="medical-outline"></ion-icon>
+    </div>
+    <span>Medicos</span>
+  </div>
+    <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Pacientes'" 
+    (click)="seleccionarTab('pacientes')">
+    <div class="icon-bg">
+    <ion-icon name="accessibility-outline"></ion-icon>
+    </div>
+    <span>Pacientes</span>
+  </div>
+  
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'dashboard'" 
+    (click)="seleccionarTab('dashboard')">
+    <div class="icon-bg">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+    </div>
+    <span>Dashboard</span>
+  </div>
+</div>

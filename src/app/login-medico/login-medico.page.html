@@ -1,0 +1,44 @@
+
+<ion-content class="login-content">
+ <div class="login-wrapper">
+  <form class="login-form" (ngSubmit)="login()">
+    <!-- 👇 Logo arriba -->
+    <img src="assets/logo.png" alt="Logo" class="logo animate-logo" />
+    <h1 class="login-title">Hola!</h1>
+    <h2 class="login-subtitle">Bienvenido</h2>
+
+    <ion-item lines="none" class="login-input">
+      <ion-label position="stacked">Correo electrónico</ion-label>
+      <ion-input
+        [(ngModel)]="credenciales.correo"
+        name="correo"
+        type="email"
+        required
+        placeholder="ejemplo@gmail.com"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item lines="none" class="login-input">
+      <ion-label position="stacked">Contraseña</ion-label>
+      <ion-input
+        [(ngModel)]="credenciales.contrasena"
+        name="contrasena"
+        type="password"
+        required
+        placeholder="••••••••••••"
+        [type]="verContrasena ? 'text' : 'password'"
+
+      ></ion-input>
+      <ion-icon
+        slot="end"
+        [name]="verContrasena ? 'eye-off-outline' : 'eye-outline'"
+        (click)="toggleVerContrasena()"
+        class="ver-icon"
+      ></ion-icon>
+    </ion-item>
+    <ion-button expand="block" class="login-btn" type="submit">
+      Inicio Sesión
+    </ion-button>
+  </form>
+  </div>
+</ion-content>

@@ -1,0 +1,61 @@
+// .splash-container {
+//   height: 100vh;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   align-items: center;
+// }
+
+// .logo {
+//   width: 600px;
+//   max-width: 100%;
+//   margin-bottom: 20px;
+// }
+
+// .titulo {
+//   font-weight: bold;
+//   color: #3b3b98;
+// }
+
+.splash-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.logo {
+  width: 560px;
+  max-width: 100%;
+  opacity: 0;
+  transform: translateY(100px);
+  animation: slideInLogo 1s ease-out forwards;
+}
+
+.welcome-text {
+     font-family: 'Josefin Sans', sans-serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #a1a1a3;
+  margin-top: 30px;
+  opacity: 0;
+  transform: translateY(100px);
+  animation: slideInText 1s ease-out forwards;
+  animation-delay: 1s; // empieza después del logo
+}
+
+@keyframes slideInLogo {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInText {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

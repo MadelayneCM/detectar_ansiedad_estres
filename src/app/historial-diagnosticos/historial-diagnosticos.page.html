@@ -1,0 +1,148 @@
+
+<ion-header>
+  <ion-toolbar  style="--background: #000000; --color: white;">
+    <ion-title style="text-align: left; font-size: 18px; ">Historial de Diagnósticos</ion-title>
+     <ion-buttons slot="end" *ngIf="medicoActivo">
+        <ion-button disabled fill="clear">
+          <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+          {{ medicoActivo.nombre }}
+        </ion-button>
+
+        <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content  class="ion-padding contenido-ajustada" [fullscreen]="true">
+
+  <!-- 🔍 Buscador -->
+  <ion-item>
+    <ion-label position="floating">Buscar paciente por nombre</ion-label>
+    <ion-input  name="nombrePaciente"  [(ngModel)]="nombrePaciente" (ionInput)="buscarPorNombre()"></ion-input>
+  </ion-item>
+
+  <!-- 📊 Gráfico -->
+  <div *ngIf="diagnosticosFiltrados.length > 0" style="display: flex; justify-content: center; margin: 20px 0;">
+    <canvas #chartCanvas style="max-width: 350px; max-height: 350px;"></canvas>
+  </div>
+
+  <!-- 📋 Tabla de Diagnósticos -->
+   <div class="tabla-scroll">
+  <ion-grid *ngIf="diagnosticosFiltrados.length > 0" class="tabla-responsive">
+    <ion-row class="encabezado" >
+      <ion-col size="1"><strong>Fecha</strong></ion-col>
+      <ion-col size="2"><strong>Paciente</strong></ion-col>
+      <ion-col size="1"><strong>Tipo Diagnostico</strong></ion-col>
+      <ion-col size="1.5"><strong>Estado</strong></ion-col>
+      <ion-col size="2"><strong>Valores</strong></ion-col>
+      <ion-col size="2.5"><strong>Medico Responsable</strong></ion-col>
+      <ion-col size="2">Historial Médico</ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let diag of diagnosticosFiltrados" class="fila">
+      <ion-col size="1">{{ diag.fecha }}</ion-col>
+      <ion-col size="2">{{ diag.nombre }}</ion-col>
+      <ion-col size="1">{{ diag.tipo | titlecase }}</ion-col>
+      <ion-col size="1.5" [ngStyle]="{ 'color': getColor(diag.estado), 'font-weight': 'bold' }">
+        {{ diag.estado }}
+      </ion-col>
+      <ion-col size="2">
+        <ng-container *ngIf="diag.emg !== null">EMG: {{ diag.emg }}<br></ng-container>
+        ECG: {{ diag.ecg }}<br>
+        RESP: {{ diag.resp }}<br>
+        TEMP: {{ diag.temp }}<br>
+        EDA: {{ diag.eda }}
+      </ion-col>
+      <ion-col size="2.5"> {{diag.medico || 'Desconocido'}}</ion-col>
+      <ion-col size="2">
+      <ion-button  size="small" class="botonhis" (click)="verHistorialMedico(diag.nombre)">
+        Ver historial médico </ion-button> </ion-col>
+
+    </ion-row>
+  </ion-grid>
+  </div>
+  <div class="paginacion-responsive" *ngIf="totalPages > 1">
+    <ion-button class="paginacion-btn" fill="outline" (click)="cambiarPagina(currentPage - 1)"
+      [disabled]="currentPage === 1">
+      ← Anterior
+    </ion-button>
+
+    <span class="pagina-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <ion-button class="paginacion-btn" fill="outline" (click)="cambiarPagina(currentPage + 1)"
+      [disabled]="currentPage === totalPages">
+      Siguiente →
+    </ion-button>
+  </div>
+
+</ion-content>
+
+
+<!-- Bottom Tab personalizada -->
+<div class="tab-bar-custom">
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Inicio'" 
+    (click)="seleccionarTab('home')">
+    <div class="icon-bg">
+      <ion-icon name="home-outline"></ion-icon>
+    </div>
+    <span>Inicio</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'diagnostico'" 
+    (click)="seleccionarTab('formulario-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="pulse-outline"></ion-icon>
+    </div>
+    <span>Diagnóstico</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'historial'" 
+    (click)="seleccionarTab('historial-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="time-outline"></ion-icon>
+    </div>
+    <span>Historial</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Médicos'" 
+    (click)="seleccionarTab('historial-medicos')">
+    <div class="icon-bg">
+    <ion-icon name="medical-outline"></ion-icon>
+    </div>
+    <span>Medicos</span>
+  </div>
+
+   <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Pacientes'" 
+    (click)="seleccionarTab('pacientes')">
+    <div class="icon-bg">
+    <ion-icon name="accessibility-outline"></ion-icon>
+    </div>
+    <span>Pacientes</span>
+  </div>
+  
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'dashboard'" 
+    (click)="seleccionarTab('dashboard')">
+    <div class="icon-bg">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+    </div>
+    <span>Dashboard</span>
+  </div>
+</div>
+

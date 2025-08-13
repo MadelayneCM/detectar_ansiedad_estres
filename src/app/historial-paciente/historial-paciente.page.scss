@@ -1,0 +1,44 @@
+.contenedor-historial {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --background: #ffffff;
+  padding: 12px;
+  text-align: justify;
+}
+
+ion-label h2 {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.paginacion-historial {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.botonexp{
+     --background: #3e4b6c;
+
+  font-size: 15px;
+  height: auto;
+  line-height: 1.2;
+//   max-width: 140px; // límite opcional del ancho
+  white-space: normal; // permite que el texto salte de línea si es necesario
+  text-align: center;
+  --border-radius: 8px;
+  align-items: center;
+}

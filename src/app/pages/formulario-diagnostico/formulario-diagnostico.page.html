@@ -1,0 +1,179 @@
+
+ <ion-header>
+  <ion-toolbar  style="--background: #000000; --color: white;">
+    <ion-title style="font-size: 14px; ">Diagnóstico de Estrés y Ansiedad</ion-title>
+    <ion-buttons slot="end" *ngIf="medicoActivo">
+        <ion-button disabled fill="clear">
+          <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+          {{ medicoActivo.nombre }}
+        </ion-button>
+
+        <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+ <div class="card-formulario">
+
+  <!-- NUEVO -->
+  <h2>Datos del Paciente</h2>
+    <ion-item>
+      <ion-label position="floating">Cédula</ion-label>
+      <ion-input [(ngModel)]="cedulaBuscar" name="cedulaBuscar" type="text"></ion-input>
+      <ion-button slot="end" (click)="buscarPaciente()">Buscar</ion-button>
+    </ion-item>
+    <div *ngIf="pacienteEncontrado">
+      <ion-item>
+        <ion-label>Paciente:</ion-label>
+        <ion-text>{{ pacienteEncontrado.nombre }} {{ pacienteEncontrado.apellido }}</ion-text>
+      </ion-item>
+    </div>
+
+  <form *ngIf="pacienteEncontrado" (ngSubmit)="mostrarResultado()">
+    
+   <!-- Radios para seleccionar tipo de diagnóstico -->
+    <ion-item>
+      <ion-label style=  "font-weight: bold;">¿Qué deseas diagnosticar?</ion-label>
+    </ion-item>
+    <ion-radio-group [value]="tipoDiagnostico" (ionChange)="tipoDiagnostico = $event.detail.value">
+      <ion-item>
+        <ion-label>Estrés</ion-label>
+        <ion-radio slot="start" value="estres"></ion-radio>
+      </ion-item>
+      <ion-item>
+        <ion-label>Ansiedad</ion-label>
+        <ion-radio slot="start" value="ansiedad"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+
+
+    <!-- Datos generales -->
+    <!-- <ion-item>
+      <ion-label position="floating">Nombre del Paciente</ion-label>
+      <ion-input [(ngModel)]="nombrePaciente" name="nombrePaciente" required [ngModelOptions]="{standalone: true}"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Edad</ion-label>
+      <ion-input type="number" inputmode="numeric" [(ngModel)]="edad" name="edad" required [ngModelOptions]="{standalone: true}"></ion-input>
+    </ion-item> -->
+
+    <!-- Campos solo para Estrés -->
+    <ng-container *ngIf="tipoDiagnostico === 'estres'">
+      <ion-item>
+        <ion-label position="floating">EMG (mV)</ion-label>
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="emg" name="emg" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+    </ng-container>
+
+    <!-- Campos comunes para ambos -->
+    <ng-container *ngIf="tipoDiagnostico">
+      <ion-item>
+        <ion-label position="floating">ECG (mV)</ion-label>
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="ecg" name="ecg" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Respiración</ion-label>
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="resp" name="resp" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Temperatura (°C)</ion-label>
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="temp" name="temp" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">EDA (µS)</ion-label>
+        <ion-input type="number" inputmode="numeric" [(ngModel)]="eda" name="eda" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+    </ng-container>
+
+    <ion-button expand="block" type="submit">
+      Diagnosticar
+    </ion-button>
+
+        <ng-container *ngIf="diagnosticoGenerado && estado !== 'Normal'">
+      <ion-item>
+        <ion-label position="floating">Tratamiento sugerido</ion-label>
+        <ion-input [(ngModel)]="tratamiento" name="tratamiento" required [ngModelOptions]="{standalone: true}"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="botontrat" (click)="guardarConTratamiento()">
+        Guardar con Tratamiento
+      </ion-button>
+    </ng-container>
+  </form>
+  </div>
+
+</ion-content>
+
+
+
+<!-- Bottom Tab personalizada -->
+<div class="tab-bar-custom">
+   <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Inicio'" 
+    (click)="seleccionarTab('home')">
+    <div class="icon-bg">
+      <ion-icon name="home-outline"></ion-icon>
+    </div>
+    <span>Inicio</span>
+  </div>
+
+   <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'diagnostico'" 
+    (click)="seleccionarTab('formulario-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="pulse-outline"></ion-icon>
+    </div>
+    <span>Diagnóstico</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'historial'" 
+    (click)="seleccionarTab('historial-diagnostico')">
+    <div class="icon-bg">
+      <ion-icon name="time-outline"></ion-icon>
+    </div>
+    <span>Historial</span>
+  </div>
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Médicos'" 
+    (click)="seleccionarTab('historial-medicos')">
+    <div class="icon-bg">
+    <ion-icon name="medical-outline"></ion-icon>
+    </div>
+    <span>Medicos</span>
+  </div>
+
+   <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'Pacientes'" 
+    (click)="seleccionarTab('pacientes')">
+    <div class="icon-bg">
+    <ion-icon name="accessibility-outline"></ion-icon>
+    </div>
+    <span>Pacientes</span>
+  </div>
+
+ 
+
+  <div 
+    class="tab-item" 
+    [class.active]="tabSeleccionado === 'dashboard'" 
+    (click)="seleccionarTab('dashboard')">
+    <div class="icon-bg">
+      <ion-icon name="bar-chart-outline"></ion-icon>
+    </div>
+    <span>Dashboard</span>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+{
+  "name": "detector-estres",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

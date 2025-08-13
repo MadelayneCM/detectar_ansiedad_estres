@@ -1,0 +1,19 @@
+<!-- <ion-header>
+  <ion-toolbar color="primary">
+    <ion-title style="text-align: center;">Resultado del Diagnóstico</ion-title>
+  </ion-toolbar>
+</ion-header> -->
+<ion-header>
+  <ion-toolbar style="--background: #000000; --color: white; text-align: center;">
+    <ion-title style="font-size: 16px;"> Resultado del Diagnóstico </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding contenido-modal">
+  <div class="contenido-centro">
+    <p style="padding-top: 25vh;">👤 <strong>Paciente:</strong> {{ nombrePaciente }}</p>
+    <p>🧠 <strong>Estado:</strong> {{ estado }}</p>
+
+    <ion-button class="login-btn" (click)="cerrarModal()">Entendido</ion-button>
+  </div>
+</ion-content>

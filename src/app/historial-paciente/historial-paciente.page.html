@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar style="--background: #000000; --color: white;">
+    <ion-title>🩺 Historial de {{ nombrePaciente }}</ion-title>
+
+    <!-- 🔙 Botón de regresar -->
+  <div style="padding: 12px 16px;">
+    <ion-button fill="clear" color="light" size="small" (click)="volverAHistorial()">
+      <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+      Regresar al Historial
+    </ion-button>
+  </div>
+
+  </ion-toolbar>
+  <!-- 🧾 Contador de diagnósticos -->
+  <ion-card color="light" class="ion-text-center" *ngIf="diagnosticosPaciente.length > 0" style="margin: 20px 0;">
+    <ion-card-header>
+      <ion-card-title>Resumen de Diagnósticos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p style="font-weight: bold;">
+        ✅ Normal: {{ conteo.normal }} &nbsp; | &nbsp;
+        🔴 Estrés: {{ conteo.estres }} &nbsp; | &nbsp;
+        🟠 Ansiedad: {{ conteo.ansiedad }}
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="contenedor-historial">
+    <ion-list *ngIf="diagnosticosPaciente.length > 0">
+      <ion-item *ngFor="let d of diagnosticosPaciente">
+        <ion-label>
+          <h2>{{ d.fecha }} - {{ d.tipo | titlecase }}</h2>
+          <p><strong>Estado:</strong> {{ d.estado }}</p>
+          <p *ngIf="d.tratamiento"><strong>Tratamiento:</strong> {{ d.tratamiento }}</p>
+          <p><strong>Edad:</strong> {{calcularEdad(d.fechaNacimiento) }}</p>
+          <p><strong>Registrado por:</strong> {{ d.medico }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-text *ngIf="diagnosticosPaciente.length === 0" color="medium">
+      No se encontraron diagnósticos anteriores para este paciente.
+    </ion-text>
+
+    <ion-button (click)="exportarPDF()" class="botonexp" expand="block">
+      <ion-icon name="document-outline" slot="start"></ion-icon>
+      Exportar historial en PDF
+    </ion-button>
+    <div class="paginacion-historial">
+      <ion-button (click)="cambiarPagina('anterior')" [disabled]="currentPage === 1">Anterior</ion-button>
+      <ion-button (click)="cambiarPagina('siguiente')"
+        [disabled]="currentPage >= Math.ceil(diagnosticosPaciente.length / itemsPerPage)">Siguiente</ion-button>
+    </div>
+  </div>
+</ion-content>

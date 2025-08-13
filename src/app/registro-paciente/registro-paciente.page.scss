@@ -1,0 +1,87 @@
+
+ion-content.contenido-centrado {
+  --background: #dedfe1;
+  height: 100%;
+  padding: 20px;
+  display: block; // 👈 Aquí dejamos de forzar centrado con flex
+  overflow-y: auto;
+}
+
+
+
+
+.formulario-wrapper {
+  width: 100%;
+  height: auto; // 👈 importante: ya no forzamos altura
+  display: flex;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
+
+
+
+// 💎 Tarjetita pro con sombra y bordes redondeados
+.formulario-medico-container {
+  width: 90%;
+  max-width: 750px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e6e6e6;
+  font-family: 'Josefin Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.tema{
+  font-size: 17px;
+}
+
+.resp{
+  font-size: 17px;
+}
+
+// ✏️ Campos del formulario
+.formulario-medico-container ion-item {
+  --background: transparent;
+  margin-bottom: 18px;
+  border-radius: 10px;
+}
+
+.boton-guardar {
+  --background: #3e4b6c;
+  --color: white;
+  --border-radius: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  height: 48px;
+  margin-top: 24px;
+}
+
+.login-btn {
+  --background: #3e4b6c;
+  --color: #fff;
+  --border-radius: 30px;
+  height: 50px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.ver-icon {
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+  margin-top: 29px !important; 
+}
+
+ion-datetime {
+  --background: #fff1f2;
+  --background-rgb: 255, 241, 242;
+
+  border-radius: 16px;
+  box-shadow: rgba(var(--ion-color-rose-rgb), 0.3) 0px 10px 15px -3px;
+}

@@ -1,0 +1,205 @@
+
+
+// parte inferior
+.tab-bar-custom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f0f2fc;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 20px;
+  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 12px;
+  color: #a0a0c0;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.tab-item:hover {
+  transform: scale(1.1);
+}
+
+.tab-item .icon-bg {
+  background: transparent;
+  border-radius: 50px;
+  padding: 6px;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-item.active {
+  color: #2d3e50;
+}
+
+.tab-item.active .icon-bg {
+  background: #d3d8ff;
+}
+
+.tab-item.active ion-icon {
+  color: #1e2f91;
+}
+
+
+
+.tabla-historial {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.encabezado {
+  background-color: #3b4553;
+  font-weight: 600;
+  text-align: center;
+  color: #d2d4df;
+  padding: 12px 8px;
+  border-bottom: 1px solid #8199bd;
+  font-weight: bold;
+}
+
+.fila {
+  border-bottom: 1px solid #9a9fd1;
+  text-align: left;
+  color: #444;
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  
+
+  ion-col {
+    padding: 12px 8px;
+  }
+
+  ion-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    --background: transparent;
+    --color: #6b7280;
+  }
+
+  ion-icon {
+    font-size: 25px;
+    padding: 5px;
+  }
+}
+
+.fila:hover {
+  background-color: #ffffff;
+}
+
+.fila:nth-child(even) {
+  background-color: #5849ff4d;
+}
+
+.boton-agregar-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px;
+}
+
+
+// Tabla responsive
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1rem;
+}
+
+.tabla-scroll ion-grid {
+  min-width: 900px;
+}
+
+// Paginación
+.paginacion-responsive {
+  
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap; // evita que se salte a otra línea
+  overflow-x: auto;   // permite deslizar horizontalmente si el espacio es estrecho
+  padding: 0 10px;
+
+    .pagina-info {
+    white-space: nowrap;
+    font-size: 14px;
+    color: #6b7280
+  }
+}
+
+.paginacion-btn {
+  --border-radius: 20px; // 🌕 Bien redonditos
+  --border-color: #000000;
+  --color: #000000;
+  --background: transparent;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+// Al hacer clic (active/focus), cambia a fondo azul y texto blanco
+.paginacion-btn:focus,
+.paginacion-btn:active,
+.paginacion-btn.activated {
+  --background: #3b3f5c;
+  --color: white;
+}
+
+// Cuando está deshabilitado
+.paginacion-btn[disabled] {
+  opacity: 0.5;
+  --border-color: #ccc;
+  --color: #999;
+  cursor: not-allowed;
+}
+
+.btn-agregar {
+  --background: #1e3a8a; /* Azul oscuro elegante */
+  --color: #ffffff;      /* Texto blanco */
+  --border-radius: 20px;
+  font-weight: 500;
+  font-size: 14px;
+  justify-content: flex-end;
+  ion-icon,
+  span,
+  .emoji {
+    color: white;
+  }
+
+
+}
+
+// Iconos
+ion-icon {
+  font-size: 22px;
+  color: inherit;
+}
+
+ion-button:hover ion-icon {
+  color: #1f2937;
+}
+
+.contenido-ajustada::part(scroll) {
+  padding-bottom: 120px; // 👈 ajusta según la altura real de tu tab-bar
+}

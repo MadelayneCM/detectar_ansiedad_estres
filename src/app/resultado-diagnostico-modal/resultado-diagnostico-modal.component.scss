@@ -1,0 +1,22 @@
+.contenido-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; // Ojo: esto es clave
+}
+
+.contenido-centro {
+  text-align: center;
+}
+
+.login-btn {
+  --background: #3e4b6c;
+  --color: #fff;
+  --border-radius: 30px;
+  height: 65px;
+  width: 20vh;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 20vh;
+  
+}
