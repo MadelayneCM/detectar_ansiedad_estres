@@ -1,26 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem,IonLabel,IonText,IonList, IonButton, IonIcon, IonCardContent
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonText, IonList, IonButton, IonIcon, IonCardContent
   , IonCardTitle, IonCardHeader, IonCard
- } from '@ionic/angular/standalone';
+} from '@ionic/angular/standalone';
 import { ActivatedRoute, Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-
-
+import { ApiService } from '../services/api.service';
+import { ConsultaPorCedula } from '../interfaces/interfaceConsulta';
 @Component({
   selector: 'app-historial-paciente',
   templateUrl: './historial-paciente.page.html',
   styleUrls: ['./historial-paciente.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonItem,IonLabel,IonText, IonIcon, IonCardContent, IonCardTitle, IonCardHeader
-    ,IonList,IonButton, IonCard, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonText, IonIcon, IonCardContent, IonCardTitle, IonCardHeader
+    , IonList, IonButton, IonCard, CommonModule, FormsModule]
 })
 export class HistorialPacientePage implements OnInit {
 
-    nombrePaciente: string = '';
+  nombrePaciente: string = '';
   diagnosticosPaciente: any[] = [];
 
   diagnosticosFiltrados: any[] = [];
@@ -31,19 +31,16 @@ export class HistorialPacientePage implements OnInit {
   Math = Math;
 
   conteo = {
-  estres: 0,
-  ansiedad: 0,
-  normal: 0
-};
+    estres: 0,
+    ansiedad: 0,
+    normal: 0
+  };
 
-
-  
-
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) { }
 
   ngOnInit() {
 
-     this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       this.nombrePaciente = params['nombre'] || '';
 
       const todos = JSON.parse(localStorage.getItem('diagnosticos') || '[]');
@@ -54,16 +51,43 @@ export class HistorialPacientePage implements OnInit {
 
       this.paginar();
 
-  this.conteo = {
-   estres: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'estrés').length,
-   ansiedad: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'ansiedad').length,
-   normal: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'normal').length
-  };
+      this.conteo = {
+        estres: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'estrés').length,
+        ansiedad: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'ansiedad').length,
+        normal: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'normal').length
+      };
     });
-  
+
   }
 
-   paginar() {
+  obtenerHistorialPorCedula(cedula: string) {
+    if (!cedula) return;
+
+    this.apiService.listarConsultasPorCedula(cedula).subscribe({
+      next: (data: ConsultaPorCedula[]) => {
+        this.diagnosticosPaciente = data.map(d => ({
+          ...d,
+          edad: this.calcularEdad(d.fecha_consulta) // si quieres calcular edad aquí
+        }));
+
+        this.paginar();
+
+        this.conteo = {
+          estres: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'estrés').length,
+          ansiedad: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'ansiedad').length,
+          normal: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'normal').length
+        };
+      },
+      error: (err) => {
+        console.error('Error al cargar historial:', err);
+        this.diagnosticosPaciente = [];
+        this.diagnosticosFiltrados = [];
+      }
+    });
+  }
+
+
+  paginar() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     this.diagnosticosFiltrados = this.diagnosticosPaciente.slice(start, end);
@@ -101,21 +125,20 @@ export class HistorialPacientePage implements OnInit {
   }
 
   volverAHistorial() {
-  this.router.navigate(['/historial-diagnostico']); // 👈 Cambia la ruta según corresponda
-}
-
-calcularEdad(fechaISO: string): number {
-  if (!fechaISO) return 0;
-  const fechaNacimiento = new Date(fechaISO);
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-  const mes = hoy.getMonth() - fechaNacimiento.getMonth();
-
-  if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-    edad--;
+    this.router.navigate(['/historial-diagnostico']); // 👈 Cambia la ruta según corresponda
   }
-  return edad;
-}
 
+  calcularEdad(fechaISO: string): number {
+    if (!fechaISO) return 0;
+    const fechaNacimiento = new Date(fechaISO);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  }
 
 }

@@ -30,13 +30,13 @@
 <ion-content class="ion-padding">
   <div class="contenedor-historial">
     <ion-list *ngIf="diagnosticosPaciente.length > 0">
-      <ion-item *ngFor="let d of diagnosticosPaciente">
+      <ion-item *ngFor="let d of diagnosticosFiltrados">
         <ion-label>
-          <h2>{{ d.fecha }} - {{ d.tipo | titlecase }}</h2>
+          <h2>{{ d.fecha_consulta }} - {{ d.tipo_diagnostico | titlecase }}</h2>
           <p><strong>Estado:</strong> {{ d.estado }}</p>
           <p *ngIf="d.tratamiento"><strong>Tratamiento:</strong> {{ d.tratamiento }}</p>
           <p><strong>Edad:</strong> {{calcularEdad(d.fechaNacimiento) }}</p>
-          <p><strong>Registrado por:</strong> {{ d.medico }}</p>
+          <p><strong>Registrado por:</strong> {{ d.nombre_doctor }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
