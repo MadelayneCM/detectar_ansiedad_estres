@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonGrid, IonRow, IonCol
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonGrid, IonRow, IonCol
   , IonItem, IonLabel, IonInput, IonIcon, IonButtons, IonButton
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { ViewChild, ElementRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-
 import { AlertController } from '@ionic/angular';
-
+import { ApiService } from '../services/api.service';
+import { ConsultaPorCedula } from '../interfaces/interfaceConsulta';
+import { ChangeDetectorRef } from '@angular/core';
 
 Chart.register(...registerables);
-
-
 
 @Component({
   selector: 'app-historial-diagnosticos',
@@ -25,29 +25,28 @@ Chart.register(...registerables);
   ]
 })
 export class HistorialDiagnosticosPage implements OnInit {
-      tabSeleccionado: string = 'historial';
+  tabSeleccionado: string = 'historial';
+
+  cedulaPaciente: string = '';
+  diagnosticosFiltrados: any[] = [];
+  diagnosticos: ConsultaPorCedula[] = [];
 
 
-  diagnosticos: any[] = [];
- nombrePaciente: string = '';
-diagnosticosFiltrados: any[] = [];
+  // nuevas cosas agregadas
+  currentPage: number = 1;
+  itemsPerPage: number = 4;
+  totalPages: number = 1;
 
 
-// nuevas cosas agregadas
-currentPage: number = 1;
-itemsPerPage: number = 4;
-totalPages: number = 1;
+  // aaa
+  medicos: any[] = [];
+  medicoActivo: any = null;
 
-// aaa
- medicos: any[] = [];
-    medicoActivo: any = null;
-
-     // Se ejecuta cada vez que entras a esta página
+  // Se ejecuta cada vez que entras a esta página
   ionViewWillEnter() {
     this.cargarMedicos();
     this.verificarSesion();
   }
-
 
   private cargarMedicos() {
     const datosGuardados = localStorage.getItem('medicosHistorial');
@@ -69,49 +68,33 @@ totalPages: number = 1;
     this.medicoActivo = sesion ? JSON.parse(sesion) : null;
   }
 
-
-
-
-
   @ViewChild('chartCanvas') chartCanvas!: ElementRef;
   chart: any;
 
-  constructor(private router: Router, private alertCtrl: AlertController) {}
+  constructor(private router: Router, private alertCtrl: AlertController, private apiService: ApiService, private cdr: ChangeDetectorRef
+  ) { }
 
 
   ngOnInit() {
-  // 🔹 1. Cargar diagnósticos
-  const guardados = localStorage.getItem('diagnosticos');
-  this.diagnosticos = guardados ? JSON.parse(guardados) : [];
-  this.diagnosticosFiltrados = this.diagnosticos;
-
-  // 🔹 2. Cargar médicos
-  const datosGuardados = localStorage.getItem('medicosHistorial');
-  if (datosGuardados) {
-    let medicos = JSON.parse(datosGuardados);
-
-    // Asegurar que todos tengan ID único
-    medicos = medicos.map((m: any) => ({
-      ...m,
-      id: m.id ?? Date.now() + Math.random()
-    }));
-
-    this.medicos = medicos;
-    localStorage.setItem('medicosHistorial', JSON.stringify(this.medicos));
-    this.totalPages = Math.ceil(this.diagnosticos.length / this.itemsPerPage);
-    this.actualizarDiagnosticosPaginados();
-
+    this.apiService.listarConsultas().subscribe((consultas: ConsultaPorCedula[]) => {
+      this.diagnosticosFiltrados = consultas.map(d => ({
+        fecha_consulta: d.fecha_consulta || '',
+        nombre_paciente: d.nombre_paciente || '',
+        tipo_diagnostico: d.tipo_diagnostico || '',
+        estado: d.estado || '',
+        atributos: d.atributos ? (typeof d.atributos === 'string' ? JSON.parse(d.atributos.replace(/'/g, '"')) : d.atributos) : {},
+        nombre_doctor: d.nombre_doctor || 'Desconocido',
+        tratamiento: d.tratamiento || ''
+      }));
+      console.log('Consultas generales:', consultas); // 👈 Verifica si hay datos
+      this.totalPages = Math.ceil(this.diagnosticosFiltrados.length / this.itemsPerPage);
+      this.currentPage = 1;
+      this.actualizarDiagnosticosPaginados();
+    });
   }
-
-  // 🔹 3. Verificar si hay médico logueado
-  const sesion = localStorage.getItem('medicoActivo');
-  if (sesion) {
-    this.medicoActivo = JSON.parse(sesion);
-  }
-}
-
 
   getColor(estado: string): string {
+    if (!estado) return 'black'; //añadi esto -MD
     switch (estado.toLowerCase()) {
       case 'estrés':
         return 'red';
@@ -126,132 +109,184 @@ totalPages: number = 1;
     this.router.navigate(['/formulario-diagnostico']);
   }
 
-  // ESTE SI ME VALE 18:21 2/07/2025
-  // buscarPorNombre() {
-  // const nombre = this.nombrePaciente.trim().toLowerCase();
-  // this.diagnosticosFiltrados = this.diagnosticos.filter(d =>
-  //   d.nombre.toLowerCase().includes(nombre)
-  // );
-  // this.actualizarGrafico(); // <-- MUY IMPORTANTE
-  // }
-  buscarPorNombre() {
-  const nombre = this.nombrePaciente.trim().toLowerCase();
-  const filtrados = this.diagnosticos.filter(d =>
-    d.nombre.toLowerCase().includes(nombre)
-  );
-  this.totalPages = Math.ceil(filtrados.length / this.itemsPerPage);
-  this.currentPage = 1;
-  this.diagnosticosFiltrados = filtrados.slice(0, this.itemsPerPage);
-  this.actualizarGrafico();
-}
+  consultasPorCedula: ConsultaPorCedula[] = [];
 
+  buscarPorCedula() {
+    if (!this.cedulaPaciente) {
+      this.apiService.listarConsultas().subscribe({
+        next: (data: ConsultaPorCedula[]) => {
+          this.diagnosticosFiltrados = data.map(d => ({
+            fecha_consulta: d.fecha_consulta || '',
+            cedula_paciente: d.cedula_paciente || '',
+            nombre_paciente: d.nombre_paciente || '',
+            tipo_diagnostico: d.tipo_diagnostico || '',
+            estado: d.estado || '',
+            atributos: d.atributos ? (typeof d.atributos === 'string' ? JSON.parse(d.atributos.replace(/'/g, '"')) : d.atributos) : {},
+            nombre_doctor: d.nombre_doctor || 'Desconocido',
+            tratamiento: d.tratamiento || ''
+          }));
+          this.totalPages = Math.ceil(this.diagnosticosFiltrados.length / this.itemsPerPage);
+          this.currentPage = 1;
+          this.cdr.detectChanges();
+          this.actualizarDiagnosticosPaginados();
+          //this.actualizarGrafico(this.diagnosticosFiltrados);
+
+        },
+        error: (err) => {
+          console.error(err);
+          this.diagnosticosFiltrados = [];
+        }
+      });
+      return;
+    }
+
+    // Con cédula: filtramos usando el endpoint
+    this.apiService.listarConsultasPorCedula(this.cedulaPaciente).subscribe({
+      next: (data: ConsultaPorCedula[]) => {
+        this.diagnosticosFiltrados = data.map(d => ({
+          fecha_consulta: d.fecha_consulta,
+          cedula_paciente: d.cedula_paciente,
+          nombre_paciente: d.nombre_paciente,
+          tipo_diagnostico: d.tipo_diagnostico,
+          estado: d.estado,
+          atributos: d.atributos
+            ? typeof d.atributos === 'string'
+              ? JSON.parse(d.atributos.replace(/'/g, '"'))
+              : d.atributos
+            : {},
+          nombre_doctor: d.nombre_doctor,
+          tratamiento: d.tratamiento
+        }));
+
+        this.totalPages = Math.ceil(this.diagnosticosFiltrados.length / this.itemsPerPage);
+        this.currentPage = 1;
+        this.cdr.detectChanges();
+
+        this.actualizarDiagnosticosPaginados();
+        //this.actualizarGrafico(this.diagnosticosFiltrados);
+
+      },
+      error: (err) => {
+        console.error(err);
+        this.diagnosticosFiltrados = [];
+      }
+    });
+  }
 
   ionViewDidEnter() {
-    setTimeout(() => this.actualizarGrafico(), 100); // Asegura que el canvas esté cargado
+    //setTimeout(() => this.actualizarGrafico(), 100); // Asegura que el canvas esté cargado
+    this.apiService.listarConsultas().subscribe((consultas: ConsultaPorCedula[]) => {
+      this.actualizarGrafico(consultas);
+    });
   }
 
-  actualizarGrafico() {
-  if (!this.chartCanvas) return;
+  actualizarGrafico(datos: any[] = this.diagnosticosFiltrados) {
+    if (!this.chartCanvas) return;
 
-  const conteo = {
-    estrés: 0,
-    ansiedad: 0,
-    normal: 0,
-  };
+    const conteo = {
+      estrés: 0,
+      ansiedad: 0,
+      normal: 0,
+    };
 
-  for (let diag of this.diagnosticosFiltrados) {
-    const estado = diag.estado.toLowerCase();
-    if (estado in conteo) {
-      conteo[estado as keyof typeof conteo]++;
+    for (let item of datos) {
+      // Puede venir como "estado" (local) o "con_estado" (API)
+      const estado = (item.estado || item.estado || '').toLowerCase();
+      if (estado in conteo) {
+        conteo[estado as keyof typeof conteo]++;
+      }
     }
-  }
 
-  const total = this.diagnosticosFiltrados.length || 1;
-  const data = [
-    conteo.estrés,
-    conteo.ansiedad,
-    conteo.normal,
-  ];
+    const data = [
+      conteo.estrés,
+      conteo.ansiedad,
+      conteo.normal,
+    ];
 
-  const labels = ['Estrés', 'Ansiedad', 'Normal'];
+    const labels = ['Estrés', 'Ansiedad', 'Normal'];
 
-  if (this.chart) {
-    this.chart.destroy();
-  }
+    if (this.chart) {
+      this.chart.destroy();
+    }
 
-  this.chart = new Chart(this.chartCanvas.nativeElement, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: ['red', 'orange', 'green'],
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // Permite ajustar el tamaño con CSS
-      plugins: {
-        legend: {
-          position: 'bottom',
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: ['red', 'orange', 'green'],
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
         },
       },
-    },
-  });
-}
+    });
+  }
 
-seleccionarTab(tab: string) {
+
+  seleccionarTab(tab: string) {
     this.tabSeleccionado = tab;
     this.router.navigate([`/${tab}`]);
   }
 
   async verValores(diag: any) {
-  const mensaje = `
-    ${diag.emg !== null ? 'EMG: ' + diag.emg + '<br>' : ''}
-    ECG: ${diag.ecg}<br>
-    RESP: ${diag.resp}<br>
-    TEMP: ${diag.temp}<br>
-    EDA: ${diag.eda}
+    const mensaje = `
+    ${diag.emg !== null ? 'EMG: ' + diag.atributos.EMG + '<br>' : ''}
+    ECG: ${diag.atributos.ECG}<br>
+    RESP: ${diag.atributos.RESP}<br>
+    TEMP: ${diag.atributos.TEMP}<br>
+    EDA: ${diag.atributos.EDA}<br>
   `;
 
-  const alert = await this.alertCtrl.create({
-    header: 'Valores Fisiológicos',
-    message: mensaje,
-    buttons: ['Cerrar'],
-  });
+    const alert = await this.alertCtrl.create({
+      header: 'Valores Fisiológicos',
+      message: mensaje,
+      buttons: ['Cerrar'],
+    });
 
-  await alert.present();
-}
-
-  
-  
+    await alert.present();
+  }
 
   cerrarSesion() {
-  localStorage.removeItem('medicoActivo');
-  this.router.navigate(['/login-medico']);
+    localStorage.removeItem('medicoActivo');
+    this.router.navigate(['/login-medico']);
   }
 
-
-  verHistorialMedico(nombre: string) {
-  this.router.navigate(['/historial-paciente'], {
-    queryParams: { nombre }
-  });
-}
-
-// nueva info
-actualizarDiagnosticosPaginados() {
-  const start = (this.currentPage - 1) * this.itemsPerPage;
-  const end = start + this.itemsPerPage;
-  this.diagnosticosFiltrados = this.diagnosticos.slice(start, end);
-  this.actualizarGrafico();
-}
-
-cambiarPagina(nuevaPagina: number) {
-  if (nuevaPagina >= 1 && nuevaPagina <= this.totalPages) {
-    this.currentPage = nuevaPagina;
-    this.actualizarDiagnosticosPaginados();
+  verHistorialMedico(cedula: string) {
+    console.log('Cédula del paciente:', cedula);
+    this.router.navigate(['/historial-paciente'], {
+      queryParams: { cedula }
+    });
   }
-}
 
+  // nueva info
+  actualizarDiagnosticosPaginados() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+
+    if (this.diagnosticosFiltrados.length > 0) {
+      this.consultasPorCedula = this.diagnosticosFiltrados.slice(start, end);
+      this.actualizarGrafico(this.diagnosticosFiltrados);
+    } else {
+      this.consultasPorCedula = this.diagnosticos.slice(start, end);
+      this.actualizarGrafico(this.diagnosticos);
+    }
+  }
+
+  cambiarPagina(nuevaPagina: number) {
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPages) {
+      this.currentPage = nuevaPagina;
+      this.actualizarDiagnosticosPaginados();
+      // refresca el gráfico con los datos de la página actual
+      this.actualizarGrafico(this.consultasPorCedula);
+    }
+  }
 
 }

@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons, IonButton} from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons, IonButton } from '@ionic/angular/standalone';
 import { Chart } from 'chart.js/auto';
 import { Router } from '@angular/router';
 
@@ -10,17 +10,17 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar,IonIcon, IonButtons, IonButton,CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons, IonButton, CommonModule, FormsModule]
 })
-export class DashboardPage implements AfterViewInit, OnInit{
+export class DashboardPage implements AfterViewInit, OnInit {
 
-      tabSeleccionado: string = 'dashboard';
+  tabSeleccionado: string = 'dashboard';
 
 
-        medicos: any[] = [];
-    medicoActivo: any = null;
+  medicos: any[] = [];
+  medicoActivo: any = null;
 
-     // Se ejecuta cada vez que entras a esta página
+  // Se ejecuta cada vez que entras a esta página
   ionViewWillEnter() {
     this.cargarMedicos();
     this.verificarSesion();
@@ -47,34 +47,32 @@ export class DashboardPage implements AfterViewInit, OnInit{
     this.medicoActivo = sesion ? JSON.parse(sesion) : null;
   }
 
-
-
   // ESTE SI VALE
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   ngOnInit() {
-  // 1. Cargar médicos del localStorage
-  const datosGuardados = localStorage.getItem('medicosHistorial');
-  if (datosGuardados) {
-    let medicos = JSON.parse(datosGuardados);
+    // 1. Cargar médicos del localStorage
+    const datosGuardados = localStorage.getItem('medicosHistorial');
+    if (datosGuardados) {
+      let medicos = JSON.parse(datosGuardados);
 
-    // Asegurar que todos tengan ID único
-    medicos = medicos.map((m: any) => ({
-      ...m,
-      id: m.id ?? Date.now() + Math.random()
-    }));
+      // Asegurar que todos tengan ID único
+      medicos = medicos.map((m: any) => ({
+        ...m,
+        id: m.id ?? Date.now() + Math.random()
+      }));
 
-    this.medicos = medicos;
-    localStorage.setItem('medicosHistorial', JSON.stringify(this.medicos));
+      this.medicos = medicos;
+      localStorage.setItem('medicosHistorial', JSON.stringify(this.medicos));
+    }
+
+    // 2. Verificar si hay médico logueado
+    const sesion = localStorage.getItem('medicoActivo');
+    if (sesion) {
+      this.medicoActivo = JSON.parse(sesion);
+    }
   }
-
-  // 2. Verificar si hay médico logueado
-  const sesion = localStorage.getItem('medicoActivo');
-  if (sesion) {
-    this.medicoActivo = JSON.parse(sesion);
-  }
-}
 
 
 
@@ -209,18 +207,13 @@ export class DashboardPage implements AfterViewInit, OnInit{
     });
   }
 
-   seleccionarTab(tab: string) {
+  seleccionarTab(tab: string) {
     this.tabSeleccionado = tab;
     this.router.navigate([`/${tab}`]);
   }
 
-   cerrarSesion() {
-  localStorage.removeItem('medicoActivo');
-  this.router.navigate(['/login-medico']);
+  cerrarSesion() {
+    localStorage.removeItem('medicoActivo');
+    this.router.navigate(['/login-medico']);
   }
-
-
-
-
-
 }

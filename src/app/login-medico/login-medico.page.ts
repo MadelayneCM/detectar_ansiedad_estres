@@ -1,65 +1,64 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonLabel,IonButton, IonItem, IonInput, IonIcon} from '@ionic/angular/standalone';
+import { IonContent, IonLabel, IonButton, IonItem, IonInput, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-
+import { ApiService } from 'src/app/services/api.service';
+import { Doctor } from 'src/app/interfaces/interfaceDoctor';
 
 @Component({
   selector: 'app-login-medico',
   templateUrl: './login-medico.page.html',
   styleUrls: ['./login-medico.page.scss'],
   standalone: true,
-  imports: [IonContent,IonLabel, IonButton,IonInput,IonItem,IonIcon,CommonModule, FormsModule]
+  imports: [IonContent, IonLabel, IonButton, IonInput, IonItem, IonIcon, CommonModule, FormsModule],
+  providers: [ApiService]
 })
 export class LoginMedicoPage implements OnInit {
 
-    credenciales = {
+  credenciales = {
     correo: '',
     contrasena: ''
-     };
+  };
 
-           verContrasena: boolean = false;
+  verContrasena: boolean = false;
 
-  constructor(private router: Router, private toastController: ToastController) { }
+  constructor(private router: Router, private toastController: ToastController, private apiService: ApiService) { }
 
   ngOnInit() {
   }
 
   async login() {
-    const data = localStorage.getItem('medicosHistorial');
-    const medicos = data ? JSON.parse(data) : [];
-
-    const medico = medicos.find((m: any) =>
-      m.correo === this.credenciales.correo && m.contrasena === this.credenciales.contrasena
-    );
-
-    if (!medico) {
-      const toast = await this.toastController.create({
-        message: '❌ Credenciales incorrectas.',
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
+    if (!this.credenciales.correo || !this.credenciales.contrasena) {
+      this.mostrarToast('⚠️ Ingresa correo y contraseña', 'warning');
       return;
     }
 
-    // Guardar sesión
-    localStorage.setItem('medicoActivo', JSON.stringify(medico));
+    this.apiService.login(this.credenciales.correo, this.credenciales.contrasena).subscribe({
+      next: (doctor: Doctor) => {
+        // Guardar sesión en localStorage
+        localStorage.setItem('medicoActivo', JSON.stringify(doctor));
 
-    const toast = await this.toastController.create({
-      message: `👋 Bienvenido, Dr(a). ${medico.nombre}`,
-      duration: 2000,
-      color: 'success'
+        this.mostrarToast(`👋 Bienvenido, Dr(a). ${doctor.doc_nombre}`, 'success');
+        this.router.navigate(['/historial-medicos']);
+      },
+      error: () => {
+        this.mostrarToast('❌ Credenciales incorrectas.', 'danger');
+      }
     });
-    await toast.present();
-
-    this.router.navigate(['/historial-medicos']);
   }
 
-    toggleVerContrasena() {
-  this.verContrasena = !this.verContrasena;
-}
-
+  toggleVerContrasena() {
+    this.verContrasena = !this.verContrasena;
+  }
+  
+  private async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color: color
+    });
+    await toast.present();
+  }
 }

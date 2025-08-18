@@ -5,7 +5,7 @@
     <ion-buttons slot="end" *ngIf="medicoActivo">
       <ion-button disabled fill="clear">
         <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-        {{ medicoActivo.nombre }}
+        {{ medicoActivo.doc_nombre }}
       </ion-button>
 
       <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
@@ -30,19 +30,19 @@
     </ion-row>
 
     <ion-row *ngFor="let paciente of pacientes" class="fila">
-      <ion-col size="1">{{ paciente.nombre }} {{ paciente.apellido }}</ion-col>
-      <ion-col size="2">{{ paciente.cedula }}</ion-col>
-      <ion-col size="1.2">{{ formatearFecha( paciente.fechaNacimiento) }}</ion-col>
-      <ion-col size="1.5">{{ paciente.genero }}</ion-col>
-      <ion-col siz >{{ paciente.tipoSangre }}</ion-col>
-      <ion-col >{{ paciente.correo }}</ion-col>
+      <ion-col size="1">{{ paciente.pac_nombre }} {{ paciente.pac_apellido }}</ion-col>
+      <ion-col size="2">{{ paciente.pac_cedula }}</ion-col>
+      <ion-col size="1.2">{{ formatearFecha(paciente.pac_fecnac) }}</ion-col>
+      <ion-col size="1.5">{{ paciente.pac_genero }}</ion-col>
+      <ion-col siz >{{ paciente.pac_tiposangre }}</ion-col>
+      <ion-col >{{ paciente.pac_correo }}</ion-col>
        <ion-col>
           <!-- Botón Editar -->
-          <ion-button size="small" fill="clear" (click)="editarPaciente(paciente.id)">
+          <ion-button size="small" fill="clear" (click)="editarPaciente(paciente.id_paciente)">
             <ion-icon name="create-outline" color="primary"></ion-icon>
           </ion-button>
           <!-- Botón Borrar -->
-          <ion-button size="small" fill="clear" color="danger" (click)="confirmarEliminarPaciente(paciente.id)">
+          <ion-button size="small" fill="clear" color="danger" (click)="confirmarEliminarPaciente(paciente.id_paciente)">
             <ion-icon name="trash-outline"></ion-icon>
           </ion-button>
         </ion-col>

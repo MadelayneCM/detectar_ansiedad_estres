@@ -5,7 +5,7 @@
     <ion-buttons slot="end" *ngIf="medicoActivo">
       <ion-button disabled fill="clear">
         <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-        {{ medicoActivo.nombre }}
+        {{ medicoActivo.doc_nombre }}
       </ion-button>
 
       <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
@@ -17,44 +17,38 @@
 
 <ion-content class="contenido-centrado">
   <div class="formulario-wrapper">
-    <form class="formulario-medico-container"  (ngSubmit)="guardarPaciente()">
+    <form class="formulario-medico-container" (ngSubmit)="guardarPaciente()">
 
       <!-- Cédula -->
       <ion-item>
         <ion-label class="tema" position="floating">Cédula</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.cedula" name="cedula" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_cedula" name="cedula" required></ion-input>
       </ion-item>
 
       <!-- Nombre -->
       <ion-item>
         <ion-label class="tema" position="floating">Nombre</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.nombre" name="nombre" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_nombre" name="nombre" required></ion-input>
       </ion-item>
 
       <!-- Apellido -->
       <ion-item>
         <ion-label class="tema" position="floating">Apellido</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.apellido" name="apellido" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_apellido" name="apellido" required></ion-input>
       </ion-item>
 
       <!-- Fecha de nacimiento -->
       <ion-item>
         <ion-label position="floating">Fecha de Nacimiento</ion-label>
-        <ion-datetime
-          presentation="date"
-          display-format="DD/MM/YYYY"
-          picker-format="DD/MM/YYYY"
-          placeholder="DD/MM/YYYY"
-          [(ngModel)]="nuevoPaciente.fechaNacimiento"
-          name="fechaNacimiento"
-          required>
+        <ion-datetime presentation="date" display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY"
+          placeholder="DD/MM/YYYY" [(ngModel)]="nuevoPaciente.pac_fecnac" name="fechaNacimiento" required>
         </ion-datetime>
       </ion-item>
 
       <!-- Género -->
       <ion-item>
         <ion-label class="tema" position="floating">Género</ion-label>
-        <ion-select [(ngModel)]="nuevoPaciente.genero" name="genero" required>
+        <ion-select [(ngModel)]="nuevoPaciente.pac_genero" name="genero" required>
           <ion-select-option value="masculino">Masculino</ion-select-option>
           <ion-select-option value="femenino">Femenino</ion-select-option>
           <ion-select-option value="otro">Otro</ion-select-option>
@@ -64,7 +58,7 @@
       <!-- Tipo de sangre -->
       <ion-item>
         <ion-label class="tema" position="floating">Tipo de Sangre</ion-label>
-        <ion-select [(ngModel)]="nuevoPaciente.tipoSangre" name="tipoSangre" required>
+        <ion-select [(ngModel)]="nuevoPaciente.pac_tiposangre" name="tipoSangre" required>
           <ion-select-option value="A+">A+</ion-select-option>
           <ion-select-option value="A-">A-</ion-select-option>
           <ion-select-option value="B+">B+</ion-select-option>
@@ -79,7 +73,7 @@
       <!-- Correo -->
       <ion-item>
         <ion-label class="tema" position="floating">Correo</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.correo" name="correo" type="email" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_correo" name="correo" type="email" required></ion-input>
       </ion-item>
 
       <!-- Botones -->
@@ -87,8 +81,8 @@
         Guardar Paciente
       </ion-button> -->
       <ion-button class="boton-guardar" expand="block" type="submit">
-  {{ isEdit ? 'Editar Paciente' : 'Guardar Paciente' }}
-</ion-button>
+        {{ isEdit ? 'Editar Paciente' : 'Guardar Paciente' }}
+      </ion-button>
 
 
       <ion-button expand="block" class="login-btn" (click)="regresar()">

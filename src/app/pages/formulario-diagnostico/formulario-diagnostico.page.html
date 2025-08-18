@@ -5,7 +5,7 @@
     <ion-buttons slot="end" *ngIf="medicoActivo">
         <ion-button disabled fill="clear">
           <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-          {{ medicoActivo.nombre }}
+          {{ medicoActivo.doc_nombre }}
         </ion-button>
 
         <ion-button color="danger" fill="clear" (click)="cerrarSesion()">

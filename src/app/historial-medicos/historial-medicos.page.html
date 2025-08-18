@@ -4,7 +4,7 @@
     <ion-buttons slot="end" *ngIf="medicoActivo">
       <ion-button disabled fill="clear">
         <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-        {{ medicoActivo.nombre }}
+        {{ medicoActivo.doc_nombre }}
       </ion-button>
 
       <ion-button color="danger" fill="clear" (click)="cerrarSesion()">
@@ -43,10 +43,10 @@
       </ion-row>
 
       <ion-row class="fila" *ngFor="let medico of medicosPaginados">
-        <ion-col>{{ medico.nombre }} {{medico.apellido}}</ion-col>
-        <ion-col>{{ medico.especialidad }}</ion-col>
-        <ion-col>{{ medico.correo }}</ion-col>
-        <ion-col>{{ medico.telefono }}</ion-col>
+        <ion-col>{{ medico.doc_nombre }} {{medico.doc_apellido}}</ion-col>
+        <ion-col>{{ medico.doc_especialidad }}</ion-col>
+        <ion-col>{{ medico.doc_correo }}</ion-col>
+        <ion-col>{{ medico.doc_telefono }}</ion-col>
         <!-- <ion-col>{{ medico.contrasena }}</ion-col> -->
 
         <ion-col>
@@ -61,10 +61,6 @@
               [color]="medico.activo ? 'success' : 'medium'"></ion-icon>
           </ion-button>
 
-          <!-- Botón Borrar -->
-          <ion-button size="small" fill="clear" color="danger" (click)="eliminarMedico(medico)">
-            <ion-icon name="trash-outline"></ion-icon>
-          </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
