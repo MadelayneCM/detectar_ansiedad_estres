@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButtons, IonButton } from '@ionic/angular/standalone';
 import { Chart } from 'chart.js/auto';
 import { Router } from '@angular/router';
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -49,7 +50,7 @@ export class DashboardPage implements AfterViewInit, OnInit {
 
   // ESTE SI VALE
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private apiService: ApiService) { }
 
   ngOnInit() {
     // 1. Cargar médicos del localStorage
@@ -76,31 +77,61 @@ export class DashboardPage implements AfterViewInit, OnInit {
 
 
 
-  ngAfterViewInit() {
-    const data = localStorage.getItem('diagnosticos');
-    const diagnosticos = data ? JSON.parse(data) : [];
+  // ngAfterViewInit() {
+  //   const data = localStorage.getItem('diagnosticos');
+  //   const diagnosticos = data ? JSON.parse(data) : [];
 
-    const tipos = { estrés: 0, ansiedad: 0, normal: 0 };
-    const fechas: string[] = [];
+  //   const tipos = { estrés: 0, ansiedad: 0, normal: 0 };
+  //   const fechas: string[] = [];
 
-    // Recolectar info general
-    diagnosticos.forEach((diag: any) => {
-      const estado = diag.estado?.toLowerCase();
-      if (estado in tipos) {
-        tipos[estado as keyof typeof tipos]++;
-      }
+  //   // Recolectar info general
+  //   diagnosticos.forEach((diag: any) => {
+  //     const estado = diag.estado?.toLowerCase();
+  //     if (estado in tipos) {
+  //       tipos[estado as keyof typeof tipos]++;
+  //     }
 
-      if (!fechas.includes(diag.fecha)) {
-        fechas.push(diag.fecha);
-      }
-    });
+  //     if (!fechas.includes(diag.fecha)) {
+  //       fechas.push(diag.fecha);
+  //     }
+  //   });
 
-    // 🎯 Cargar ambos gráficos
-    this.createBarChart(tipos);
-    this.createStackedBarWithLine(diagnosticos, fechas);
-  }
+  //   // 🎯 Cargar ambos gráficos
+  //   this.createBarChart(tipos);
+  //   this.createStackedBarWithLine(diagnosticos, fechas);
+  // }
 
   // 📊 Gráfico 1: Diagnósticos por tipo
+  
+
+  ngAfterViewInit() {
+  this.apiService.listarConsultas().subscribe({
+    next: (diagnosticos: any[]) => {
+      const tipos = { estrés: 0, ansiedad: 0, normal: 0 };
+      const fechas: string[] = [];
+
+      diagnosticos.forEach((diag: any) => {
+        const estado = diag.estado?.toLowerCase();
+        if (estado in tipos) {
+          tipos[estado as keyof typeof tipos]++;
+        }
+
+        // 👀 cuidado: tu endpoint usa "fecha_consulta" no "fecha"
+        if (!fechas.includes(diag.fecha_consulta)) {
+          fechas.push(diag.fecha_consulta);
+        }
+      });
+
+      // 🎯 Llamar a los gráficos con los datos del endpoint
+      this.createBarChart(tipos);
+      this.createStackedBarWithLine(diagnosticos, fechas);
+    },
+    error: (err) => {
+      console.error("Error cargando diagnósticos:", err);
+    }
+  });
+}
+
   createBarChart(tipos: { [key: string]: number }) {
     const ctx: any = document.getElementById('barChart');
 
@@ -155,7 +186,7 @@ export class DashboardPage implements AfterViewInit, OnInit {
       let total = 0;
       estados.forEach((estado) => {
         const cantidad = diagnosticos.filter((d: any) =>
-          d.fecha === fecha &&
+          d.fecha_consulta === fecha &&
           d.estado.toLowerCase() === estado
         ).length;
         dataPorEstado[estado].push(cantidad);

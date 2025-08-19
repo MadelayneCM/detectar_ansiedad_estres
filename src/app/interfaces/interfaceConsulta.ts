@@ -6,6 +6,7 @@ export interface Consulta {
     con_atributos: any; //Record<string, any>;  // Un objeto con claves dinámicas se pupede cambiar a esto hay que probar 
     con_estado: string;
     con_tratamiento: string;
+    con_tipodiag: string;
 }
 
 export interface ConsultaPorCedula {
@@ -17,4 +18,5 @@ export interface ConsultaPorCedula {
     atributos: any; // o Record<string, any> si quieres ser más estricto
     nombre_doctor: string;
     tratamiento: string;
+    fechanac: string
 }

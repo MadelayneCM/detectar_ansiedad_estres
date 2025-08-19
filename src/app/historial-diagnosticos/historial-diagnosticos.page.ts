@@ -79,6 +79,7 @@ export class HistorialDiagnosticosPage implements OnInit {
     this.apiService.listarConsultas().subscribe((consultas: ConsultaPorCedula[]) => {
       this.diagnosticosFiltrados = consultas.map(d => ({
         fecha_consulta: d.fecha_consulta || '',
+        cedula_paciente: d.cedula_paciente || '',
         nombre_paciente: d.nombre_paciente || '',
         tipo_diagnostico: d.tipo_diagnostico || '',
         estado: d.estado || '',

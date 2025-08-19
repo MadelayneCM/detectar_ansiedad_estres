@@ -20,6 +20,7 @@ import { ConsultaPorCedula } from '../interfaces/interfaceConsulta';
 })
 export class HistorialPacientePage implements OnInit {
 
+  cedulaPaciente: string = '';
   nombrePaciente: string = '';
   diagnosticosPaciente: any[] = [];
 
@@ -39,25 +40,12 @@ export class HistorialPacientePage implements OnInit {
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService) { }
 
   ngOnInit() {
-
     this.route.queryParams.subscribe(params => {
-      this.nombrePaciente = params['nombre'] || '';
-
-      const todos = JSON.parse(localStorage.getItem('diagnosticos') || '[]');
-
-      this.diagnosticosPaciente = todos.filter((d: any) =>
-        d.nombre.toLowerCase() === this.nombrePaciente.toLowerCase()
-      );
-
-      this.paginar();
-
-      this.conteo = {
-        estres: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'estrés').length,
-        ansiedad: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'ansiedad').length,
-        normal: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'normal').length
-      };
+      this.cedulaPaciente = params['cedula'] || '';
+      if (this.cedulaPaciente) {
+        this.obtenerHistorialPorCedula(this.cedulaPaciente); // 👈 usa este, NO llames al servicio directo aquí
+      }
     });
-
   }
 
   obtenerHistorialPorCedula(cedula: string) {
@@ -67,16 +55,17 @@ export class HistorialPacientePage implements OnInit {
       next: (data: ConsultaPorCedula[]) => {
         this.diagnosticosPaciente = data.map(d => ({
           ...d,
-          edad: this.calcularEdad(d.fecha_consulta) // si quieres calcular edad aquí
+          edad: this.calcularEdad(d.fechanac) // si quieres calcular edad aquí
         }));
-
         this.paginar();
 
         this.conteo = {
           estres: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'estrés').length,
           ansiedad: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'ansiedad').length,
           normal: this.diagnosticosPaciente.filter(d => d.estado.toLowerCase() === 'normal').length
+
         };
+        console.log(this.diagnosticosPaciente)
       },
       error: (err) => {
         console.error('Error al cargar historial:', err);
@@ -107,21 +96,21 @@ export class HistorialPacientePage implements OnInit {
   exportarPDF() {
     const doc = new jsPDF();
 
-    doc.text(`Historial del paciente: ${this.nombrePaciente}`, 10, 10);
+    doc.text(`Historial del paciente: ${this.cedulaPaciente}`, 10, 10);
 
     autoTable(doc, {
       head: [['Fecha', 'Tipo', 'Estado', 'Edad', 'Médico', 'Tratamiento']],
       body: this.diagnosticosPaciente.map((d: any) => [
-        d.fecha,
-        d.tipo,
+        d.fecha_consulta,
+        d.tipo_diagnostico,
         d.estado,
         d.edad,
-        d.medico,
+        d.nombre_doctor,
         d.tratamiento || 'N/A'
       ]),
     });
 
-    doc.save(`Historial_${this.nombrePaciente}.pdf`);
+    doc.save(`Historial_${this.cedulaPaciente}.pdf`);
   }
 
   volverAHistorial() {

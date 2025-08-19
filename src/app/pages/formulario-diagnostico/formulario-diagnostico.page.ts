@@ -12,6 +12,7 @@ import { ModalController } from '@ionic/angular';
 import { ResultadoDiagnosticoModalComponent } from 'src/app/resultado-diagnostico-modal/resultado-diagnostico-modal.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-formulario-diagnostico',
@@ -19,7 +20,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./formulario-diagnostico.page.scss'],
   standalone: true,
   imports: [IonRadioGroup, ReactiveFormsModule, IonContent, IonHeader, IonRadio, IonTitle, IonIcon, IonToolbar, IonItem, IonLabel,
-    IonInput, IonButton, CommonModule, FormsModule, IonButtons, IonText]
+    IonInput, IonButton, CommonModule, FormsModule, IonButtons, IonText],
+  providers: [ModalController]
+
 })
 export class FormularioDiagnosticoPage implements OnInit {
 
@@ -62,7 +65,6 @@ export class FormularioDiagnosticoPage implements OnInit {
 
   @ViewChild('alertTemplate', { static: true }) alertTemplate!: TemplateRef<any>;
 
-
   nombrePaciente = '';
   edad: any = '';
   fecha = '';
@@ -81,7 +83,7 @@ export class FormularioDiagnosticoPage implements OnInit {
 
 
 
-  constructor(private alertController: AlertController, private modalController: ModalController, private router: Router) { }
+  constructor(private alertController: AlertController, private modalController: ModalController, private router: Router, private apiService: ApiService) { }
 
   // ngOnInit() {
   // }
