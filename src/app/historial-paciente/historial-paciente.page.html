@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar style="--background: #000000; --color: white;">
-    <ion-title>🩺 Historial de {{ nombrePaciente }}</ion-title>
+    <ion-title>🩺 Historial de {{ cedulaPaciente }}</ion-title>
 
     <!-- 🔙 Botón de regresar -->
   <div style="padding: 12px 16px;">
@@ -35,7 +35,7 @@
           <h2>{{ d.fecha_consulta }} - {{ d.tipo_diagnostico | titlecase }}</h2>
           <p><strong>Estado:</strong> {{ d.estado }}</p>
           <p *ngIf="d.tratamiento"><strong>Tratamiento:</strong> {{ d.tratamiento }}</p>
-          <p><strong>Edad:</strong> {{calcularEdad(d.fechaNacimiento) }}</p>
+          <p><strong>Edad:</strong> {{calcularEdad(d.fechanac) }}</p>
           <p><strong>Registrado por:</strong> {{ d.nombre_doctor }}</p>
         </ion-label>
       </ion-item>
