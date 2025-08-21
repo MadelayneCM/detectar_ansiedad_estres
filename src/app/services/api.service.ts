@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Paciente, PacienteDatos } from '../interfaces/interfacePaciente';
 import { Doctor } from '../interfaces/interfaceDoctor'; // Asegúrate de tener esta interfaz definida
-import { Consulta, ConsultaPorCedula, GuardarConsultaRequest, GuardarConsultaResponse } from '../interfaces/interfaceConsulta'; // Asegúrate de tener esta interfaz definida
-import { AtributosEntrada, ResultadoPrediccion } from '../interfaces/interfacePrediccionEstres'; // Asegúrate de tener esta interfaz definida
+import { ConsultaPorCedula, GuardarConsultaRequest, GuardarConsultaResponse } from '../interfaces/interfaceConsulta'; // Asegúrate de tener esta interfaz definida
+import { AtributosEntrada, ResultadoPrediccion, AtributosEntradaAnsiedd, ResultadoPrediccionAnsiedad } from '../interfaces/interfacePrediccionEstres'; // Asegúrate de tener esta interfaz definida
 @Injectable({
   providedIn: 'root'
 })
@@ -87,6 +87,11 @@ export class ApiService {
   //PREDICCION ESTRES
    predecirEstres(datos: AtributosEntrada): Observable<ResultadoPrediccion> {
     return this.http.post<ResultadoPrediccion>(`${this.baseUrl}/estres/predict`, datos);
+  }
+
+  //PREDICCION ANSIEDAD
+  predecirAnsiedad(datos: AtributosEntradaAnsiedd): Observable<ResultadoPrediccionAnsiedad> {
+    return this.http.post<ResultadoPrediccionAnsiedad>(`${this.baseUrl}/ansiedad/predict`, datos);
   }
 
   // CONSULTA

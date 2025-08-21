@@ -14,7 +14,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
 import { PacienteDatos } from '../../interfaces/interfacePaciente';
-import { AtributosEntrada, ResultadoPrediccion } from 'src/app/interfaces/interfacePrediccionEstres';
+import { AtributosEntrada, AtributosEntradaAnsiedd, ResultadoPrediccion } from 'src/app/interfaces/interfacePrediccionEstres';
 import { GuardarConsultaRequest } from 'src/app/interfaces/interfaceConsulta';
 
 @Component({
@@ -35,7 +35,7 @@ export class FormularioDiagnosticoPage implements OnInit {
   medicoActivo: any = null;
   cedulaBuscar: string = '';
   pacienteEncontrado: PacienteDatos | null = null;
-  
+
 
   // Se ejecuta cada vez que entras a esta página
   ionViewWillEnter() {
@@ -108,6 +108,60 @@ export class FormularioDiagnosticoPage implements OnInit {
     }
   }
 
+  // async mostrarResultadoPrediccion() {
+  //   if (!this.tipoDiagnostico) {
+  //     const alerta = await this.alertController.create({
+  //       header: 'Diagnóstico no seleccionado',
+  //       message: 'Por favor selecciona si deseas diagnosticar estrés o ansiedad.',
+  //       buttons: ['OK'],
+  //     });
+  //     await alerta.present();
+  //     return;
+  //   }
+
+  //   const entrada: AtributosEntrada = {
+  //     EMG: Number(this.emg),
+  //     ECG: Number(this.ecg),
+  //     RESP: Number(this.resp),
+  //     TEMP: Number(this.temp),
+  //     EDA: Number(this.eda),
+  //   };
+
+  //    const entradaAnsiedad: AtributosEntradaAnsiedd = {
+  //     ecg: Number(this.ecg),
+  //     gsr: Number(this.eda),
+  //     skt: Number(this.temp),
+  //     resp: Number(this.resp),
+  //   };
+
+
+  //   this.apiService.predecirEstres(entrada).subscribe({
+  //     next: async (res) => {
+  //       this.estado = res.estado;
+  //       this.diagnosticoGenerado = true;
+
+  //       const modal = await this.modalController.create({
+  //         component: ResultadoDiagnosticoModalComponent,
+  //         componentProps: {
+  //           nombrePaciente: this.nombrePaciente,
+  //           estado: res.estado
+
+  //         }
+  //       });
+  //       await modal.present();
+  //     },
+  //     error: async (err) => {
+  //       console.error('Error en predicción:', err);
+  //       const alerta = await this.alertController.create({
+  //         header: 'Error en diagnóstico',
+  //         message: 'No se pudo obtener la predicción. Intenta de nuevo.',
+  //         buttons: ['OK'],
+  //       });
+  //       await alerta.present();
+  //     }
+  //   });
+  // }
+
   async mostrarResultadoPrediccion() {
     if (!this.tipoDiagnostico) {
       const alerta = await this.alertController.create({
@@ -119,40 +173,76 @@ export class FormularioDiagnosticoPage implements OnInit {
       return;
     }
 
-    const entrada: AtributosEntrada = {
-      EMG: Number(this.emg),
-      ECG: Number(this.ecg),
-      RESP: Number(this.resp),
-      TEMP: Number(this.temp),
-      EDA: Number(this.eda),
-    };
+    if (this.tipoDiagnostico === 'estres') {
+      const entrada: AtributosEntrada = {
+        EMG: Number(this.emg),
+        ECG: Number(this.ecg),
+        RESP: Number(this.resp),
+        TEMP: Number(this.temp),
+        EDA: Number(this.eda),
+      };
 
-    this.apiService.predecirEstres(entrada).subscribe({
-      next: async (res) => {
-        this.estado = res.estado;
-        this.diagnosticoGenerado = true;
+      this.apiService.predecirEstres(entrada).subscribe({
+        next: async (res) => {
+          this.estado = res.estado;
+          this.diagnosticoGenerado = true;
 
-        const modal = await this.modalController.create({
-          component: ResultadoDiagnosticoModalComponent,
-          componentProps: {
-            nombrePaciente: this.nombrePaciente,
-            estado: res.estado
+          const modal = await this.modalController.create({
+            component: ResultadoDiagnosticoModalComponent,
+            componentProps: {
+              nombrePaciente: this.nombrePaciente,
+              estado: res.estado
+            }
+          });
+          await modal.present();
+        },
+        error: async (err) => {
+          console.error('Error en predicción de estrés:', err);
+          const alerta = await this.alertController.create({
+            header: 'Error en diagnóstico',
+            message: 'No se pudo obtener la predicción de estrés. Intenta de nuevo.',
+            buttons: ['OK'],
+          });
+          await alerta.present();
+        }
+      });
+    }
 
-          }
-        });
-        await modal.present();
-      },
-      error: async (err) => {
-        console.error('Error en predicción:', err);
-        const alerta = await this.alertController.create({
-          header: 'Error en diagnóstico',
-          message: 'No se pudo obtener la predicción. Intenta de nuevo.',
-          buttons: ['OK'],
-        });
-        await alerta.present();
-      }
-    });
+    if (this.tipoDiagnostico === 'ansiedad') {
+      const entradaAnsiedad: AtributosEntradaAnsiedd = {
+        ecg: Number(this.ecg),
+        gsr: Number(this.eda),   // mapeo: gsr = EDA
+        skt: Number(this.temp),  // mapeo: skt = Temp
+        resp: Number(this.resp),
+      };
+
+      this.apiService.predecirAnsiedad(entradaAnsiedad).subscribe({
+        next: async (res) => {
+          this.estado = res.estado;
+          this.diagnosticoGenerado = true;
+
+          const modal = await this.modalController.create({
+            component: ResultadoDiagnosticoModalComponent,
+            componentProps: {
+              nombrePaciente: this.nombrePaciente,
+              estado: res.estado
+            }
+          });
+          await modal.present();
+        },
+        error: async (err) => {
+          console.error('Error en predicción de ansiedad:', err);
+          const alerta = await this.alertController.create({
+            header: 'Error en diagnóstico',
+            message: 'No se pudo obtener la predicción de ansiedad. Intenta de nuevo.',
+            buttons: ['OK'],
+          });
+          await alerta.present();
+        }
+      });
+    }
   }
+
 
   goToHistorial() {
     this.router.navigate(['/historial-diagnostico']);
