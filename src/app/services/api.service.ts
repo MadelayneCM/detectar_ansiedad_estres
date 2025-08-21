@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Paciente } from '../interfaces/interfacePaciente';
+import { Paciente, PacienteDatos } from '../interfaces/interfacePaciente';
 import { Doctor } from '../interfaces/interfaceDoctor'; // Asegúrate de tener esta interfaz definida
-import { Consulta, ConsultaPorCedula } from '../interfaces/interfaceConsulta'; // Asegúrate de tener esta interfaz definida
+import { Consulta, ConsultaPorCedula, GuardarConsultaRequest, GuardarConsultaResponse } from '../interfaces/interfaceConsulta'; // Asegúrate de tener esta interfaz definida
+import { AtributosEntrada, ResultadoPrediccion } from '../interfaces/interfacePrediccionEstres'; // Asegúrate de tener esta interfaz definida
 @Injectable({
   providedIn: 'root'
 })
@@ -28,6 +29,11 @@ export class ApiService {
   //obtiene los pacientes por cedula con todos los datos
   getPacientePorCedulaDatos(cedula: string): Observable<Paciente> {
     return this.http.get<Paciente>(`${this.baseUrl}/pacientes/buscarPacienteCed/${cedula}`);
+  }
+
+  //Obtiene paciente por Cedula (nombre/apellido/fechanac)
+  getPacienteCedulaDatos(cedula: string): Observable<PacienteDatos> {
+    return this.http.get<PacienteDatos>(`${this.baseUrl}/pacientes/obtenerPaciente/${cedula}`);
   }
 
   getPacienteId(id: number): Observable<Paciente> {
@@ -69,10 +75,6 @@ export class ApiService {
     return this.http.put<any>(`${this.baseUrl}/doctores/cambiarEstado/${id}`, {});
   }
 
-  // CONSULTA
-  guardarConsulta(consulta: Consulta): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/consultas`, consulta);
-  }
   //consultaPorCedula edvuelve la misma estructura que necesito
   listarConsultas(): Observable<ConsultaPorCedula[]> {
     return this.http.get<ConsultaPorCedula[]>(`${this.baseUrl}/consultas/consultasCompletas`);
@@ -80,6 +82,19 @@ export class ApiService {
 
   listarConsultasPorCedula(cedula: string): Observable<ConsultaPorCedula[]> {
     return this.http.get<ConsultaPorCedula[]>(`${this.baseUrl}/consultas/porCedula/${cedula}`);
+  }
+
+  //PREDICCION ESTRES
+   predecirEstres(datos: AtributosEntrada): Observable<ResultadoPrediccion> {
+    return this.http.post<ResultadoPrediccion>(`${this.baseUrl}/estres/predict`, datos);
+  }
+
+  // CONSULTA
+  guardarConsulta(consultaData: GuardarConsultaRequest): Observable<GuardarConsultaResponse> {
+    return this.http.post<GuardarConsultaResponse>(
+      `${this.baseUrl}/consultas/guardarConsulta`, 
+      consultaData
+    );
   }
 
 }

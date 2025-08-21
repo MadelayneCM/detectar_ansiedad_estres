@@ -8,3 +8,9 @@ export interface Paciente {
     pac_tiposangre: string;
     pac_correo: string;
 }
+
+export interface PacienteDatos {
+  nombre: string;
+  apellido: string;
+  fechanac: string;
+}

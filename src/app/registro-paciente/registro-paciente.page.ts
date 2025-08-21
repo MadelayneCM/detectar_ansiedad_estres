@@ -66,7 +66,7 @@ export class RegistroPacientePage implements OnInit {
   constructor(private router: Router, private toastController: ToastController, private route: ActivatedRoute, private apiService: ApiService) { }
 
   ngOnInit() {
-   const id = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.apiService.getPacienteId(+id).subscribe(data => {
         this.nuevoPaciente = data;
@@ -90,7 +90,11 @@ export class RegistroPacientePage implements OnInit {
     }
   }
 
- guardarPaciente() {
+  guardarPaciente() {
+    if (this.nuevoPaciente.pac_fecnac) {
+      this.nuevoPaciente.pac_fecnac = this.nuevoPaciente.pac_fecnac.split('T')[0];
+    }
+
     if (this.nuevoPaciente.id_paciente && this.nuevoPaciente.id_paciente > 0) {
       // Actualizar
       this.apiService.actualizarPaciente(this.nuevoPaciente.id_paciente, this.nuevoPaciente)
