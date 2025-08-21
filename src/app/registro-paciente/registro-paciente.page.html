@@ -22,33 +22,33 @@
       <!-- Cédula -->
       <ion-item>
         <ion-label class="tema" position="floating">Cédula</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_cedula" name="cedula" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_cedula" name="pac_cedula" required></ion-input>
       </ion-item>
 
       <!-- Nombre -->
       <ion-item>
         <ion-label class="tema" position="floating">Nombre</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_nombre" name="nombre" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_nombre" name="pac_nombre" required></ion-input>
       </ion-item>
 
       <!-- Apellido -->
       <ion-item>
         <ion-label class="tema" position="floating">Apellido</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_apellido" name="apellido" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_apellido" name="pac_apellido" required></ion-input>
       </ion-item>
 
       <!-- Fecha de nacimiento -->
       <ion-item>
         <ion-label position="floating">Fecha de Nacimiento</ion-label>
         <ion-datetime presentation="date" display-format="DD/MM/YYYY" picker-format="DD/MM/YYYY"
-          placeholder="DD/MM/YYYY" [(ngModel)]="nuevoPaciente.pac_fecnac" name="fechaNacimiento" required>
+          placeholder="DD/MM/YYYY" [(ngModel)]="nuevoPaciente.pac_fecnac" name="pac_fecnac" required>
         </ion-datetime>
       </ion-item>
 
       <!-- Género -->
       <ion-item>
         <ion-label class="tema" position="floating">Género</ion-label>
-        <ion-select [(ngModel)]="nuevoPaciente.pac_genero" name="genero" required>
+        <ion-select [(ngModel)]="nuevoPaciente.pac_genero" name="pac_genero" required>
           <ion-select-option value="masculino">Masculino</ion-select-option>
           <ion-select-option value="femenino">Femenino</ion-select-option>
           <ion-select-option value="otro">Otro</ion-select-option>
@@ -58,7 +58,7 @@
       <!-- Tipo de sangre -->
       <ion-item>
         <ion-label class="tema" position="floating">Tipo de Sangre</ion-label>
-        <ion-select [(ngModel)]="nuevoPaciente.pac_tiposangre" name="tipoSangre" required>
+        <ion-select [(ngModel)]="nuevoPaciente.pac_tiposangre" name="pac_tipoSangre" required>
           <ion-select-option value="A+">A+</ion-select-option>
           <ion-select-option value="A-">A-</ion-select-option>
           <ion-select-option value="B+">B+</ion-select-option>
@@ -73,7 +73,7 @@
       <!-- Correo -->
       <ion-item>
         <ion-label class="tema" position="floating">Correo</ion-label>
-        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_correo" name="correo" type="email" required></ion-input>
+        <ion-input class="resp" [(ngModel)]="nuevoPaciente.pac_correo" name="pac_correo" type="email" required></ion-input>
       </ion-item>
 
       <!-- Botones -->

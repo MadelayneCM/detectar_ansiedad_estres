@@ -20,3 +20,22 @@ export interface ConsultaPorCedula {
     tratamiento: string;
     fechanac: string
 }
+export interface GuardarConsultaRequest {
+    cedula: string;
+    id_doctor: number;
+    atributos: any;
+    estado: string;
+    tratamiento: string;
+    tipo_diag: string;
+}
+
+export interface GuardarConsultaResponse {
+    id_consulta: number;
+    id_paciente: number;
+    id_doctor: number;
+    con_fecha: string;
+    con_atributos: any;
+    con_estado: string;
+    con_tratamiento: string;
+    con_tipodiag: string;
+}

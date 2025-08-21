@@ -13,6 +13,9 @@ import { ResultadoDiagnosticoModalComponent } from 'src/app/resultado-diagnostic
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/services/api.service';
+import { PacienteDatos } from '../../interfaces/interfacePaciente';
+import { AtributosEntrada, ResultadoPrediccion } from 'src/app/interfaces/interfacePrediccionEstres';
+import { GuardarConsultaRequest } from 'src/app/interfaces/interfaceConsulta';
 
 @Component({
   selector: 'app-formulario-diagnostico',
@@ -31,7 +34,8 @@ export class FormularioDiagnosticoPage implements OnInit {
   medicos: any[] = [];
   medicoActivo: any = null;
   cedulaBuscar: string = '';
-  pacienteEncontrado: any = null;
+  pacienteEncontrado: PacienteDatos | null = null;
+  
 
   // Se ejecuta cada vez que entras a esta página
   ionViewWillEnter() {
@@ -39,7 +43,6 @@ export class FormularioDiagnosticoPage implements OnInit {
     this.verificarSesion();
 
   }
-
 
   private cargarMedicos() {
     const datosGuardados = localStorage.getItem('medicosHistorial');
@@ -61,8 +64,6 @@ export class FormularioDiagnosticoPage implements OnInit {
     this.medicoActivo = sesion ? JSON.parse(sesion) : null;
   }
 
-
-
   @ViewChild('alertTemplate', { static: true }) alertTemplate!: TemplateRef<any>;
 
   nombrePaciente = '';
@@ -80,29 +81,25 @@ export class FormularioDiagnosticoPage implements OnInit {
   diagnosticoGenerado: boolean = false;
   estado: string = '';
 
-
-
-
   constructor(private alertController: AlertController, private modalController: ModalController, private router: Router, private apiService: ApiService) { }
 
   // ngOnInit() {
   // }
 
   ngOnInit() {
-    // 1. Cargar médicos del localStorage
-    const datosGuardados = localStorage.getItem('medicosHistorial');
-    if (datosGuardados) {
-      let medicos = JSON.parse(datosGuardados);
-
-      // Asegurar que todos tengan ID único
-      medicos = medicos.map((m: any) => ({
-        ...m,
-        id: m.id ?? Date.now() + Math.random()
-      }));
-
-      this.medicos = medicos;
-      localStorage.setItem('medicosHistorial', JSON.stringify(this.medicos));
-    }
+    // 1. Cargar médicos desde la API
+    this.apiService.getDoctores().subscribe({
+      next: (medicos: any[]) => {
+        // Asegurar que todos tengan ID único
+        this.medicos = medicos.map((m: any) => ({
+          ...m,
+          id: m.id ?? Date.now() + Math.random()
+        }));
+      },
+      error: (err) => {
+        console.error('Error al cargar médicos:', err);
+      }
+    });
 
     // 2. Verificar si hay médico logueado
     const sesion = localStorage.getItem('medicoActivo');
@@ -111,39 +108,7 @@ export class FormularioDiagnosticoPage implements OnInit {
     }
   }
 
-
-  private esNumeroValido(valor: any): boolean {
-    const num = Number(valor);
-    return valor !== null && valor !== '' && valor !== undefined && !isNaN(num);
-  }
-
-  detectarEstado(): string {
-    const emg = Number(this.emg);
-    const ecg = Number(this.ecg);
-    const resp = Number(this.resp);
-    const temp = Number(this.temp);
-    const eda = Number(this.eda);
-
-    if (this.tipoDiagnostico === 'estres') {
-      if (emg > 50 || ecg > 100 || eda > 5) {
-        return 'Estrés';
-      } else {
-        return 'Normal';
-      }
-    }
-
-    if (this.tipoDiagnostico === 'ansiedad') {
-      if (temp < 36 && resp > 20) {
-        return 'Ansiedad';
-      } else {
-        return 'Normal';
-      }
-    }
-
-    return 'Desconocido';
-  }
-
-  async mostrarResultado() {
+  async mostrarResultadoPrediccion() {
     if (!this.tipoDiagnostico) {
       const alerta = await this.alertController.create({
         header: 'Diagnóstico no seleccionado',
@@ -154,81 +119,39 @@ export class FormularioDiagnosticoPage implements OnInit {
       return;
     }
 
-    this.nombrePaciente = String(this.nombrePaciente);
-    // this.edad = Number(this.edad);
-    this.emg = Number(this.emg);
-    this.ecg = Number(this.ecg);
-    this.resp = Number(this.resp);
-    this.temp = Number(this.temp);
-    this.eda = Number(this.eda);
-
-    if (
-      // !this.nombrePaciente.trim() ||
-      // !this.esNumeroValido(this.edad) ||
-      (this.tipoDiagnostico === 'estres' && !this.esNumeroValido(this.emg)) ||
-      !this.esNumeroValido(this.ecg) ||
-      !this.esNumeroValido(this.resp) ||
-      !this.esNumeroValido(this.temp) ||
-      !this.esNumeroValido(this.eda)
-    ) {
-      const alerta = await this.alertController.create({
-        header: 'Campos incompletos',
-        message: 'Por favor completa todos los campos con datos válidos.',
-        buttons: ['OK'],
-      });
-      await alerta.present();
-      return;
-    }
-
-    const estado = this.detectarEstado();
-
-    // ✅ Guardar en localStorage
-    const nuevoDiagnostico = {
-      nombre: this.nombrePaciente,
-      fechaNacimiento: this.pacienteEncontrado?.fechaNacimiento || '', // 👈 Guardar fecha nacimiento
-      tipo: this.tipoDiagnostico,
-      fecha: new Date().toLocaleDateString(),
-      emg: this.tipoDiagnostico === 'estres' ? this.emg : null,
-      ecg: this.ecg,
-      resp: this.resp,
-      temp: this.temp,
-      eda: this.eda,
-      estado: estado,
-      // medico: this.medicoActivo ? this.medicoActivo.nombre : 'Desconocido',
-      medico: this.medicoActivo
-        ? `${this.medicoActivo.nombre} ${this.medicoActivo.apellido}`
-        : 'Desconocido',
-
-
+    const entrada: AtributosEntrada = {
+      EMG: Number(this.emg),
+      ECG: Number(this.ecg),
+      RESP: Number(this.resp),
+      TEMP: Number(this.temp),
+      EDA: Number(this.eda),
     };
 
-    const previos = localStorage.getItem('diagnosticos');
-    const diagnosticos = previos ? JSON.parse(previos) : [];
-    diagnosticos.push(nuevoDiagnostico);
-    localStorage.setItem('diagnosticos', JSON.stringify(diagnosticos));
+    this.apiService.predecirEstres(entrada).subscribe({
+      next: async (res) => {
+        this.estado = res.estado;
+        this.diagnosticoGenerado = true;
 
-    // ✅ Mostrar modal
-    const modal = await this.modalController.create({
-      component: ResultadoDiagnosticoModalComponent,
-      componentProps: {
-        nombrePaciente: this.nombrePaciente,
-        estado: estado
+        const modal = await this.modalController.create({
+          component: ResultadoDiagnosticoModalComponent,
+          componentProps: {
+            nombrePaciente: this.nombrePaciente,
+            estado: res.estado
+
+          }
+        });
+        await modal.present();
+      },
+      error: async (err) => {
+        console.error('Error en predicción:', err);
+        const alerta = await this.alertController.create({
+          header: 'Error en diagnóstico',
+          message: 'No se pudo obtener la predicción. Intenta de nuevo.',
+          buttons: ['OK'],
+        });
+        await alerta.present();
       }
     });
-    await modal.present();
-
-    // 🧼 Limpiar formulario
-    this.nombrePaciente = '';
-    this.edad = '';
-    this.tipoDiagnostico = '';
-    this.emg = '';
-    this.ecg = '';
-    this.resp = '';
-    this.temp = '';
-    this.eda = '';
-    this.diagnosticoGenerado = true;
-    this.estado = estado;
-
   }
 
   goToHistorial() {
@@ -243,64 +166,137 @@ export class FormularioDiagnosticoPage implements OnInit {
     this.router.navigate([`/${tab}`]);
   }
 
-
-
   cerrarSesion() {
     localStorage.removeItem('medicoActivo');
     this.router.navigate(['/login-medico']);
   }
 
-  guardarConTratamiento() {
-    const diagnosticos = JSON.parse(localStorage.getItem('diagnosticos') || '[]');
+  // guardarConTratamiento() {
+  //   const diagnosticos = JSON.parse(localStorage.getItem('diagnosticos') || '[]');
 
-    // Encuentra el último diagnóstico (el más reciente)
-    const ultimo = diagnosticos[diagnosticos.length - 1];
+  //   // Encuentra el último diagnóstico (el más reciente)
+  //   const ultimo = diagnosticos[diagnosticos.length - 1];
 
-    if (ultimo) {
-      ultimo.tratamiento = this.tratamiento;
-      localStorage.setItem('diagnosticos', JSON.stringify(diagnosticos));
-      this.tratamiento = '';
-      this.diagnosticoGenerado = false;
-      this.estado = '';
+  //   if (ultimo) {
+  //     ultimo.tratamiento = this.tratamiento;
+  //     localStorage.setItem('diagnosticos', JSON.stringify(diagnosticos));
+  //     this.tratamiento = '';
+  //     this.diagnosticoGenerado = false;
+  //     this.estado = '';
 
-      this.alertController.create({
-        header: '✅ Tratamiento Guardado',
-        message: 'El tratamiento ha sido guardado exitosamente junto al diagnóstico.',
-        buttons: ['OK']
-      }).then(alert => alert.present());
-    }
-  }
-  // Simula búsqueda en localStorage
-  // buscarPaciente() {
-  //   const pacientesData = localStorage.getItem('pacientesHistorial');
-  //   const pacientes = pacientesData ? JSON.parse(pacientesData) : [];
-
-  //   this.pacienteEncontrado = pacientes.find((p: any) => p.cedula === this.cedulaBuscar);
-
-  //   if (!this.pacienteEncontrado) {
-  //     this.mostrarAlertaPacienteNoEncontrado();
+  //     this.alertController.create({
+  //       header: '✅ Tratamiento Guardado',
+  //       message: 'El tratamiento ha sido guardado exitosamente junto al diagnóstico.',
+  //       buttons: ['OK']
+  //     }).then(alert => alert.present());
   //   }
   // }
 
-  // segunda prueba
-  buscarPaciente() {
-    const pacientesData = localStorage.getItem('pacientesHistorial');
-    const pacientes = pacientesData ? JSON.parse(pacientesData) : [];
+  async guardarConTratamiento() {
+    try {
+      // Validar que todos los campos estén llenos
+      if (!this.tratamiento.trim()) {
+        this.mostrarAlerta('Error', 'Por favor ingrese el tratamiento');
+        return;
+      }
 
-    // Buscar por coincidencia exacta
-    const encontrado = pacientes.find((p: any) => p.cedula === this.cedulaBuscar);
+      if (!this.pacienteEncontrado) {
+        this.mostrarAlerta('Error', 'No se ha encontrado un paciente');
+        return;
+      }
 
-    if (encontrado) {
-      this.pacienteEncontrado = encontrado;
-      // Rellenar automáticamente el nombre
-      this.nombrePaciente = `${encontrado.nombre} ${encontrado.apellido}`;
-    } else {
-      this.pacienteEncontrado = null;
-      this.mostrarAlertaPacienteNoEncontrado();
+      // Preparar los datos para enviar al backend
+      const consultaData: GuardarConsultaRequest = {
+        cedula: this.cedulaBuscar,
+        id_doctor: this.medicoActivo.id_doctor, // Asumiendo que tienes el médico activo
+        atributos: {
+          EMG: this.emg || 0,
+          ECG: this.ecg || 0,
+          RESP: this.resp || 0,
+          TEMP: this.temp || 0,
+          EDA: this.eda || 0
+        },
+        estado: this.estado,
+        tratamiento: this.tratamiento,
+        tipo_diag: this.tipoDiagnostico === 'estres' ? 'Estrés' : 'Ansiedad'
+      };
+
+      // Enviar al backend
+      this.apiService.guardarConsulta(consultaData).subscribe({
+        next: (response) => {
+          console.log('Consulta guardada exitosamente:', response);
+
+          // Limpiar el formulario
+          this.limpiarFormulario();
+
+          this.mostrarAlertaExito('✅ Consulta Guardada',
+            'El diagnóstico y tratamiento han sido guardados exitosamente en el sistema.');
+        },
+        error: (error) => {
+          console.error('Error al guardar consulta:', error);
+          this.mostrarAlerta('Error',
+            'No se pudo guardar la consulta. Por favor, intente nuevamente.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error inesperado:', error);
+      this.mostrarAlerta('Error', 'Ocurrió un error inesperado');
     }
   }
+  buscarPaciente() {
+    this.apiService.getPacienteCedulaDatos(this.cedulaBuscar).subscribe({
+      next: (encontrado: any) => {
+        if (encontrado) {
+          this.pacienteEncontrado = encontrado;
+          // Rellenar automáticamente el nombre
+          this.nombrePaciente = `${encontrado.nombre} ${encontrado.apellido}`;
+        } else {
+          this.pacienteEncontrado = null;
+          this.mostrarAlertaPacienteNoEncontrado();
+          console.log('Paciente encontrado:', this.pacienteEncontrado);
 
+        }
+      },
+      error: (err) => {
+        console.error('Error al buscar paciente:', err);
+        this.pacienteEncontrado = null;
+        this.mostrarAlertaPacienteNoEncontrado();
+      }
+    });
+  }
 
+  private async mostrarAlerta(titulo: string, mensaje: string) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      message: mensaje,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+  private async mostrarAlertaExito(titulo: string, mensaje: string) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      message: mensaje,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+  private limpiarFormulario() {
+    this.tratamiento = '';
+    this.diagnosticoGenerado = false;
+    this.estado = '';
+    this.emg = 0;
+    this.ecg = 0;
+    this.resp = 0;
+    this.temp = 0;
+    this.eda = 0;
+    this.tipoDiagnostico = '';
+    this.pacienteEncontrado = null;
+    this.cedulaBuscar = '';
+  }
 
   async mostrarAlertaPacienteNoEncontrado() {
     const alert = await this.alertController.create({
@@ -313,9 +309,6 @@ export class FormularioDiagnosticoPage implements OnInit {
         },
         {
           text: 'Sí',
-          // handler: () => {
-          //   this.router.navigate(['/registro-paciente']);  // ajusta esta ruta según tu configuración
-          // }
           handler: () => {
             this.router.navigate(['/registro-paciente'], { state: { origen: 'formulario-diagnostico' } });
           }
