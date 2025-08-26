@@ -6,4 +6,6 @@ export interface Doctor {
   doc_especialidad: string;
   doc_telefono: string;
   doc_clave: string;
+  doc_estado: string;
+  doc_tipo: number;
 }

@@ -70,29 +70,29 @@ export class PacientesPage implements OnInit {
     this.router.navigate(['/registro-paciente', id], { state: { origen: 'pacientes' } });
   }
 
-  async confirmarEliminarPaciente(id: number) {
-    const alert = await this.alertController.create({
-      header: 'Confirmar eliminación',
-      message: '¿Estás seguro que quieres eliminar este paciente? 🗑️',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            // Nada que hacer aquí
-          }
-        }, {
-          text: 'Eliminar',
-          handler: () => {
-            this.borrarPaciente(id);
-          }
-        }
-      ]
-    });
+  // async confirmarEliminarPaciente(id: number) {
+  //   const alert = await this.alertController.create({
+  //     header: 'Confirmar eliminación',
+  //     message: '¿Estás seguro que quieres eliminar este paciente? 🗑️',
+  //     buttons: [
+  //       {
+  //         text: 'Cancelar',
+  //         role: 'cancel',
+  //         cssClass: 'secondary',
+  //         handler: () => {
+  //           // Nada que hacer aquí
+  //         }
+  //       }, {
+  //         text: 'Eliminar',
+  //         handler: () => {
+  //           this.borrarPaciente(id);
+  //         }
+  //       }
+  //     ]
+  //   });
 
-    await alert.present();
-  }
+  //   await alert.present();
+  // }
 
   async borrarPaciente(id: number) {
     const data = localStorage.getItem('pacientesHistorial');
@@ -101,7 +101,7 @@ export class PacientesPage implements OnInit {
     let pacientes = JSON.parse(data);
 
     // Filtramos para eliminar el paciente con el id
-    pacientes = pacientes.filter((p: any) => p.id !== id);
+   // pacientes = pacientes.filter((p: any) => p.id !== id);
 
     // Guardamos la lista actualizada
     localStorage.setItem('pacientesHistorial', JSON.stringify(pacientes));
@@ -110,12 +110,12 @@ export class PacientesPage implements OnInit {
     this.pacientes = pacientes;
 
     // Toast de confirmación
-    const toast = await this.toastController.create({
-      message: 'Paciente eliminado correctamente',
-      duration: 2000,
-      color: 'danger'
-    });
-    await toast.present();
+    // const toast = await this.toastController.create({
+    //   message: 'Paciente eliminado correctamente',
+    //   duration: 2000,
+    //   color: 'danger'
+    // });
+    // await toast.present();
   }
 
   formatearFecha(fechaISO: string): string {

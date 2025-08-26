@@ -131,7 +131,7 @@
     <span>Historial</span>
   </div>
 
-  <div class="tab-item" [class.active]="tabSeleccionado === 'Médicos'" (click)="seleccionarTab('historial-medicos')">
+  <div class="tab-item" *ngIf="medicoActivo?.doc_tipo === 1" [class.active]="tabSeleccionado === 'Médicos'" (click)="seleccionarTab('historial-medicos')">
     <div class="icon-bg">
       <ion-icon name="medical-outline"></ion-icon>
     </div>
@@ -146,8 +146,7 @@
   </div>
 
 
-
-  <div class="tab-item" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
+  <div class="tab-item" *ngIf="medicoActivo?.doc_tipo === 1" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
     <div class="icon-bg">
       <ion-icon name="bar-chart-outline"></ion-icon>
     </div>
