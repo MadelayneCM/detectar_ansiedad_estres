@@ -1,19 +1,30 @@
-import { Component } from '@angular/core';
-import { IonContent, IonIcon} from '@ionic/angular/standalone';
+import { Component, OnInit } from '@angular/core';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Doctor } from '../interfaces/interfaceDoctor';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonContent],
+  imports: [IonContent, CommonModule],
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
-    tabSeleccionado: string = 'diagnostico';
+  tabSeleccionado: string = 'diagnostico';
+  medicoActivo: Doctor | null = null;
 
-  constructor(private router:Router) {}
-  
+  constructor(private router: Router) { }
+
+  ngOnInit() {
+    // Recuperar el médico activo del localStorage al cargar la página
+    const stored = localStorage.getItem('medicoActivo');
+    if (stored) {
+      this.medicoActivo = JSON.parse(stored);
+    }
+  }
+
   irAHistorial() {
     this.router.navigate(['historial-diagnostico']);
   }

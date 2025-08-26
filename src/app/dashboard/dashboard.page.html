@@ -60,6 +60,7 @@
 
   <div 
     class="tab-item" 
+    *ngIf="medicoActivo?.doc_tipo === 1"
     [class.active]="tabSeleccionado === 'Médicos'" 
     (click)="seleccionarTab('historial-medicos')">
     <div class="icon-bg">
@@ -80,6 +81,7 @@
 
   <div 
     class="tab-item" 
+    *ngIf="medicoActivo?.doc_tipo === 1"
     [class.active]="tabSeleccionado === 'dashboard'" 
     (click)="seleccionarTab('dashboard')">
     <div class="icon-bg">

@@ -42,9 +42,9 @@
             <ion-icon name="create-outline" color="primary"></ion-icon>
           </ion-button>
           <!-- Botón Borrar -->
-          <ion-button size="small" fill="clear" color="danger" (click)="confirmarEliminarPaciente(paciente.id_paciente)">
+          <!-- <ion-button size="small" fill="clear" color="danger" (click)="confirmarEliminarPaciente(paciente.id_paciente)">
             <ion-icon name="trash-outline"></ion-icon>
-          </ion-button>
+          </ion-button> -->
         </ion-col>
     </ion-row>
   </ion-grid>
@@ -78,7 +78,7 @@
     <span>Historial</span>
   </div>
 
-  <div class="tab-item" [class.active]="tabSeleccionado === 'Médicos'" (click)="seleccionarTab('historial-medicos')">
+  <div class="tab-item" *ngIf="medicoActivo?.doc_tipo === 1" [class.active]="tabSeleccionado === 'Médicos'" (click)="seleccionarTab('historial-medicos')">
     <div class="icon-bg">
       <ion-icon name="medical-outline"></ion-icon>
     </div>
@@ -92,12 +92,11 @@
     <div class="icon-bg">
       <ion-icon name="accessibility-outline"></ion-icon>
     </div>
-    <span>Dashboard</span>
+    <span>Pacientes</span>
   </div>
 
 
-
-  <div class="tab-item" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
+  <div class="tab-item" *ngIf="medicoActivo?.doc_tipo === 1" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
     <div class="icon-bg">
       <ion-icon name="bar-chart-outline"></ion-icon>
     </div>

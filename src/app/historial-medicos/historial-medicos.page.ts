@@ -59,7 +59,8 @@ export class HistorialMedicosPage implements OnInit {
     this.apiService.cambiarEstadoDoctor(medico.id_doctor).subscribe({
       next: (res) => {
         console.log(res.mensaje);
-        this.cargarMedicos(); // recarga la lista actualizada
+        //this.cargarMedicos(); // recarga la lista actualizada
+        medico.doc_estado = res.estado;
       },
       error: (err) => {
         console.error('Error cambiando estado:', err);

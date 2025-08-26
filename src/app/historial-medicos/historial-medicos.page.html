@@ -57,8 +57,8 @@
 
           <!-- Botón Activar/Desactivar -->
           <ion-button size="small" fill="clear" (click)="toggleEstado(medico)">
-            <ion-icon [name]="medico.activo ? 'eye-outline' : 'eye-off-outline'"
-              [color]="medico.activo ? 'success' : 'medium'"></ion-icon>
+            <ion-icon [name]="medico.doc_estado === 'ACTIVO' ? 'eye-outline' : 'eye-off-outline'"
+              [color]="medico.doc_estado === 'ACTIVO' ? 'success' : 'medium'"></ion-icon>
           </ion-button>
 
         </ion-col>
@@ -138,7 +138,7 @@
 
 
 
-  <div class="tab-item" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
+  <div class="tab-item" *ngIf="medicoActivo?.doc_tipo === 1" [class.active]="tabSeleccionado === 'dashboard'" (click)="seleccionarTab('dashboard')">
     <div class="icon-bg">
       <ion-icon name="bar-chart-outline"></ion-icon>
     </div>

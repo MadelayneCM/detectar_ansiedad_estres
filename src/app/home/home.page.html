@@ -10,11 +10,11 @@
       <span class="pill">Pacientes</span>
     </div>
 
-     <div class="card custom-card verde" (click)="irAMed()">
+     <div class="card custom-card verde" (click)="irAMed()" *ngIf="medicoActivo?.doc_tipo === 1">
       <span class="pill">Medicos</span>
     </div>
     
-    <div class="card custom-card amarillo" (click)="irADash()">
+    <div class="card custom-card amarillo" *ngIf="medicoActivo?.doc_tipo === 1" (click)="irADash()">
       <span class="pill">Dashboard</span>
     </div>
 
