@@ -194,6 +194,13 @@ export class FormularioDiagnosticoPage implements OnInit {
               estado: res.estado
             }
           });
+          //
+          modal.onDidDismiss().then(() => {
+            if (this.estado === 'Normal') {
+              this.guardarConsultaNormal();
+            }
+          });
+
           await modal.present();
         },
         error: async (err) => {
@@ -228,6 +235,12 @@ export class FormularioDiagnosticoPage implements OnInit {
               estado: res.estado
             }
           });
+          //
+          modal.onDidDismiss().then(() => {
+            if (this.estado === 'Normal') {
+              this.guardarConsultaNormal();
+            }
+          });
           await modal.present();
         },
         error: async (err) => {
@@ -243,6 +256,46 @@ export class FormularioDiagnosticoPage implements OnInit {
     }
   }
 
+  //
+  async guardarConsultaNormal() {
+    try {
+      if (!this.pacienteEncontrado) {
+        this.mostrarAlerta('Error', 'No se ha encontrado un paciente');
+        return;
+      }
+
+      const consultaData: GuardarConsultaRequest = {
+        cedula: this.cedulaBuscar,
+        id_doctor: this.medicoActivo.id_doctor,
+        atributos: {
+          EMG: this.emg || 0,
+          ECG: this.ecg || 0,
+          RESP: this.resp || 0,
+          TEMP: this.temp || 0,
+          EDA: this.eda || 0
+        },
+        estado: this.estado,       // Guardar aunque sea "Normal"
+        tratamiento: '',           // vacío en este caso
+        tipo_diag: this.tipoDiagnostico === 'estres' ? 'Estrés' : 'Ansiedad'
+      };
+
+      this.apiService.guardarConsulta(consultaData).subscribe({
+        next: () => {
+          console.log('Consulta normal guardada');
+          this.limpiarFormulario();
+          this.mostrarAlertaExito('✅ Consulta Guardada', 'El diagnóstico se guardó exitosamente.');
+        },
+        error: (error) => {
+          console.error('Error al guardar consulta normal:', error);
+          this.mostrarAlerta('Error', 'No se pudo guardar la consulta normal.');
+        }
+      });
+
+    } catch (error) {
+      console.error('Error inesperado:', error);
+      this.mostrarAlerta('Error', 'Ocurrió un error inesperado');
+    }
+  }
 
   goToHistorial() {
     this.router.navigate(['/historial-diagnostico']);
